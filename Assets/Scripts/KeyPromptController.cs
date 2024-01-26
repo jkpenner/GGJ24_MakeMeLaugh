@@ -16,12 +16,15 @@ public class KeyPromptController : MonoBehaviour
     private List<KeyPrompt> prompts = new List<KeyPrompt>();
     private List<KeyPrompt> despawned = new List<KeyPrompt>();
 
+    public int PromptCount => prompts.Count;
+    public KeyPrompt CurrentPrompt => prompts.Count > 0 ? prompts[0] : null;
+
     private void Awake()
     {
         rectTransform = GetComponent<RectTransform>();
     }
 
-    public void SpawnKeyPrompt()
+    public KeyPrompt SpawnKeyPrompt()
     {
         var instance = Instantiate(keyPromptPrefab);
         instance.transform.SetParent(keyPromptParent ?? transform);
@@ -31,24 +34,8 @@ public class KeyPromptController : MonoBehaviour
         instance.RectTransform.sizeDelta = new Vector2(0f, instance.RectTransform.sizeDelta.y);
         instance.Keyboard = keyboard;
 
-        var rand = Random.Range(0, 3);
-        if (rand == 0)
-        {
-            var key = (Key)Random.Range((int)Key.Space, (int)Key.Digit0);
-            instance.SetAsKeyPrompt(key, false);
-        }
-        else if (rand == 1)
-        {
-            instance.SetAsColorPrompt((KeyPromptColor)Random.Range(1, 4), false);
-        }
-        else
-        {
-            instance.SetAsRandomizePrompt();
-        }
-
-
-
         prompts.Add(instance);
+        return instance;
     }
 
     public void DespawnKeyPrompt()
