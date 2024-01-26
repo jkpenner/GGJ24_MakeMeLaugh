@@ -1,6 +1,7 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class KeyVisual : MonoBehaviour
 {
@@ -9,11 +10,12 @@ public class KeyVisual : MonoBehaviour
 
     private float t = 0f;
     private float transitionTime = 0.2f;
+    private Image image;
 
     public bool IsPressed { get; private set; }
 
-    private void Awake()
-    {
+    private void Awake() {
+        image = GetComponent<Image>();
         activeGroup.alpha = 0f;
     }
 
@@ -46,6 +48,12 @@ public class KeyVisual : MonoBehaviour
             Key.Comma => ",",
             _ => key.ToString()
         };
+    }
+    
+    public void SetColor(Color color)
+    {
+        Debug.Log("Setting color: " + color);
+        image.color = color;
     }
 
     public void SetPressed(bool isPressed)

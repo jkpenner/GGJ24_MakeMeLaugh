@@ -8,6 +8,11 @@ public class KeyboardManager : MonoBehaviour {
     
     [SerializeField] private GameObject highlightedKeyPrefab;
     [SerializeField] private Transform keyboardKeysTransform;
+    [SerializeField] private Key[] blueKeys;
+    [SerializeField] private Key[] redKeys;
+    [SerializeField] private Key[] greenKeys;
+    [SerializeField] private Key[] yellowKeys;
+    
     
     Keyboard current;
     Key[] keys;
@@ -84,5 +89,17 @@ public class KeyboardManager : MonoBehaviour {
         // foreach (Transform child in keyTransform) {
             Destroy(keyTransform.GetChild(0).gameObject);
         // }
+    }
+    
+    void AddColorToKey(Key key, Color color) {
+        string keyName = key.ToString();
+        Transform keyTransform = keyboardKeysTransform.Find(keyName);
+        if (keyTransform == null)
+        {
+            Debug.LogWarning($"Key {keyName} not found");
+            return;
+        }
+        GameObject highlight = Instantiate(highlightedKeyPrefab, keyTransform);
+        highlight.transform.SetParent(keyTransform);
     }
 }

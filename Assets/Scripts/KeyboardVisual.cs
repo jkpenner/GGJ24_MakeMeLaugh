@@ -91,7 +91,7 @@ public class KeyboardVisual : MonoBehaviour
                 }
 
                 try {
-                    Debug.Log($"Adding {keyValue} from {name}");
+//                    Debug.Log($"Adding {keyValue} from {name}");
                 visuals.Add(keyValue, visual);
                 }
                 catch (Exception e)

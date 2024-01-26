@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -7,6 +8,10 @@ public class GameManager : MonoBehaviour
     [SerializeField] TextAsset wordsAsset;
     [SerializeField] KeyPromptController prompts;
     [SerializeField] KeyboardVisual visual;
+    [SerializeField] Key[] redKeys;
+    [SerializeField] Key[] greenKeys;
+    [SerializeField] Key[] blueKeys;
+    [SerializeField] Key[] yellowKeys;
 
     Keyboard current;
     Key[] keys;
@@ -15,28 +20,30 @@ public class GameManager : MonoBehaviour
     int wordIndex = 0;
     int letterIndex = 0;
 
-    private void Awake()
-    {
+    private void Awake() {
         current = Keyboard.current;
-        if (current is null)
-        {
+        if (current is null) {
             Debug.LogWarning("No keyboard found");
         }
 
         keys = new Key[(int)Key.IMESelected - 1];
-        for (int i = 1; i < (int)Key.IMESelected; i++)
-        {
+        for (int i = 1; i < (int)Key.IMESelected; i++) {
             keys[i - 1] = (Key)i;
         }
 
-        if (wordsAsset is not null)
-        {
+        if (wordsAsset is not null) {
             words = wordsAsset.text.Split("\n");
         }
-        else
-        {
+        else {
             words = new string[] { "Hello", "World!" };
         }
+    }
+
+    private void Start() {
+        SetKeyboardColors(redKeys, Color.red);
+        SetKeyboardColors(greenKeys, Color.green);
+        SetKeyboardColors(blueKeys, Color.blue);
+        SetKeyboardColors(yellowKeys, Color.yellow);
     }
 
     private void Update()
@@ -117,6 +124,12 @@ public class GameManager : MonoBehaviour
             {
                 // Debug.LogError($"Key {key} received {e}");
             }
+        }
+    }
+
+    void SetKeyboardColors(Key[] keys, Color color) {
+        foreach (var key in keys) {
+             visual.GetKeyVisual(key).SetColor(color);
         }
     }
 }
