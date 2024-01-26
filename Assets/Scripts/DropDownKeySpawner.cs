@@ -16,16 +16,16 @@ public class DropDownKeySpawner : MonoBehaviour {
     }
     
     private void OnEnable() {
-        GameManager.OnNewKeyObject += OnNewKeyObject;
+        GameManager.OnNewKeyAction += OnNewKeyAction;
     }
     
     private void OnDisable() {
-        GameManager.OnNewKeyObject -= OnNewKeyObject;
+        GameManager.OnNewKeyAction -= OnNewKeyAction;
     }
     
-    private void OnNewKeyObject(object sender, GameManager.OnNewKeyObjectArgs e) {
+    private void OnNewKeyAction(object sender, GameManager.OnNewKeyActionArgs e) {
         GameObject dropDownGameObject = Instantiate(KeyDropDownPrefab, spawnPoint.position, Quaternion.identity);
-        dropDownGameObject.GetComponent<DropDownKey>().SetKey(e.KeyType, e.KeyColor);
+        dropDownGameObject.GetComponent<DropDownKey>().SetKey(e.KeyAction);
         dropDownGameObject.transform.SetParent(canvas.transform);
     }
     

@@ -636,8 +636,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8774d2a0f4b6d544d85f16c08384f9e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  keyColors: 0000000001000000020000000300000000000000
-  keyTypes: 0000000000000000000000000000000001000000
+  keyActionsList:
+  - KeyColor: 0
+    keyActionType: 0
+  - KeyColor: 1
+    keyActionType: 0
+  - KeyColor: 2
+    keyActionType: 0
+  - KeyColor: 3
+    keyActionType: 0
+  - KeyColor: 0
+    keyActionType: 1
+  - KeyColor: 1
+    keyActionType: 1
   timeToSendNextMove: 2
 --- !u!114 &354104200
 MonoBehaviour:

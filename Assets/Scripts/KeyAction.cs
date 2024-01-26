@@ -1,8 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
-public class KeyObject {
+[System.Serializable]
+public class KeyAction {
     public enum KeyColors {
         Red,
         Green,
@@ -11,11 +13,11 @@ public class KeyObject {
         White,
     }
     
-    public enum KeyTypes {
+    public enum KeyActionType {
         Hold,
         Release,
     }
     
     public KeyColors KeyColor;
-    public KeyTypes KeyType;
+    public KeyActionType keyActionType;
 }

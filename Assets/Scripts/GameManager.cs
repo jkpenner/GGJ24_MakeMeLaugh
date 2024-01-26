@@ -6,29 +6,26 @@ using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 
 public class GameManager : MonoBehaviour {
-    [SerializeField] private List<KeyObject.KeyColors> keyColors;
-    [SerializeField] private List<KeyObject.KeyTypes> keyTypes;
+    [SerializeField] private List<KeyAction> keyActionsList;
     [SerializeField] private float timeToSendNextMove;
-    private KeyObject keyObject;
+    private KeyAction keyAction;
     
-    public static event EventHandler<OnNewKeyObjectArgs> OnNewKeyObject;
+    public static event EventHandler<OnNewKeyActionArgs> OnNewKeyAction;
     
-    public class OnNewKeyObjectArgs : EventArgs {
-        public KeyObject.KeyTypes KeyType;
-        public KeyObject.KeyColors KeyColor;
+    public class OnNewKeyActionArgs : EventArgs {
+        public KeyAction KeyAction;
     }
 
    
     void Start() {
         StartCoroutine(SequenceToPerform());
     }
-
+    
     IEnumerator SequenceToPerform() {
-        for(int i = 0; i < keyColors.Count; i++) {
+        for(int i = 0; i < keyActionsList.Count; i++) {
             yield return new WaitForSeconds(timeToSendNextMove);
-            OnNewKeyObject?.Invoke(this, new OnNewKeyObjectArgs {
-                KeyType = keyTypes[i],
-                KeyColor = keyColors[i]
+            OnNewKeyAction?.Invoke(this, new OnNewKeyActionArgs {
+                KeyAction = keyActionsList[i]
             });
         }
     }

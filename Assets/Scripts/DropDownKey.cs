@@ -16,30 +16,30 @@ public class DropDownKey : MonoBehaviour {
         transform.position += Vector3.down * speed * Time.deltaTime;
     }
 
-    public void SetKey(KeyObject.KeyTypes keyType, KeyObject.KeyColors keyColor) {
-        if(keyType == KeyObject.KeyTypes.Hold) {
+    public void SetKey(KeyAction keyAction) {
+        if(keyAction.keyActionType == KeyAction.KeyActionType.Hold) {
             title.text = "Hold";
         } else {
             title.text = "Release";
         }
-        switch (keyColor) {
-            case KeyObject.KeyColors.Red:
+        switch (keyAction.KeyColor) {
+            case KeyAction.KeyColors.Red:
                 image.color = Color.red;
                 break;
-            case KeyObject.KeyColors.Green:
+            case KeyAction.KeyColors.Green:
                 image.color = Color.green;
                 break;
-            case KeyObject.KeyColors.Blue:
+            case KeyAction.KeyColors.Blue:
                 image.color = Color.blue;
                 break;
-            case KeyObject.KeyColors.Yellow:
+            case KeyAction.KeyColors.Yellow:
                 image.color = Color.yellow;
                 break;
-            case KeyObject.KeyColors.White:
+            case KeyAction.KeyColors.White:
                 image.color = Color.white;
                 break;
             default:
-                Debug.LogWarning($"No color found for {keyType}, {keyColor}");
+                Debug.LogWarning($"No color found for {keyAction.keyActionType}, {keyAction.KeyColor}");
                 break;
         }
     }
