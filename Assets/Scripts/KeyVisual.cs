@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class KeyVisual : MonoBehaviour
 {
@@ -14,6 +15,37 @@ public class KeyVisual : MonoBehaviour
     private void Awake()
     {
         activeGroup.alpha = 0f;
+    }
+
+    public void SetKey(Key key)
+    {
+        label.text = key switch {
+            Key.Backslash => "\\",
+            Key.Backquote => "`",
+            Key.CapsLock => "Caps Lock",
+            Key.RightShift => "Shift",
+            Key.LeftShift => "Shift",
+            Key.Minus => "-",
+            Key.Equals => "=",
+            Key.Slash => "/",
+            Key.Digit0 => "0",
+            Key.Digit1 => "1",
+            Key.Digit2 => "2",
+            Key.Digit3 => "3",
+            Key.Digit4 => "4",
+            Key.Digit5 => "5",
+            Key.Digit6 => "6",
+            Key.Digit7 => "7",
+            Key.Digit8 => "8",
+            Key.Digit9 => "9",
+            Key.RightBracket => "]",
+            Key.LeftBracket => "[",
+            Key.Semicolon => ";",
+            Key.Quote => "'",
+            Key.Period => ".",
+            Key.Comma => ",",
+            _ => key.ToString()
+        };
     }
 
     public void SetPressed(bool isPressed)

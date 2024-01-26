@@ -4,6 +4,7 @@ using UnityEngine.InputSystem;
 
 public class KeyPromptController : MonoBehaviour
 {
+    [SerializeField] KeyboardVisual keyboard;
     [SerializeField] Transform keyPromptParent;
     [SerializeField] KeyPrompt keyPromptPrefab;
 
@@ -18,7 +19,6 @@ public class KeyPromptController : MonoBehaviour
     private void Awake()
     {
         rectTransform = GetComponent<RectTransform>();
-        SpawnKeyPrompt();
     }
 
     public void SpawnKeyPrompt()
@@ -29,6 +29,10 @@ public class KeyPromptController : MonoBehaviour
         instance.RectTransform.anchorMax = new Vector2(1f, 0f);
         instance.RectTransform.anchoredPosition = new Vector2(0f, rectTransform.rect.height);
         instance.RectTransform.sizeDelta = new Vector2(0f, instance.RectTransform.sizeDelta.y);
+
+        var key = (Key)Random.Range((int)Key.Space, (int)Key.Digit0);
+        instance.Keyboard = keyboard;
+        instance.SetAsKeyPrompt(key, false);
 
         prompts.Add(instance);
     }

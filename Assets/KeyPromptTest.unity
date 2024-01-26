@@ -488,6 +488,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1147338317}
     m_Modifications:
+    - target: {fileID: 211828829723269511, guid: 795c6f30ef67b8648a8d45bf366281d4, type: 3}
+      propertyPath: keyboard
+      value: 
+      objectReference: {fileID: 7609738967724446132}
+    - target: {fileID: 211828829723269511, guid: 795c6f30ef67b8648a8d45bf366281d4, type: 3}
+      propertyPath: despawnSpeed
+      value: 2000
+      objectReference: {fileID: 0}
+    - target: {fileID: 211828829723269511, guid: 795c6f30ef67b8648a8d45bf366281d4, type: 3}
+      propertyPath: keyPromptDropSpeed
+      value: 1000
+      objectReference: {fileID: 0}
     - target: {fileID: 2563912849379972105, guid: 795c6f30ef67b8648a8d45bf366281d4, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -2271,6 +2283,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 2316081187076587110, guid: 9c75d30553e25e94693e750230cfa69c, type: 3}
   m_PrefabInstance: {fileID: 7609738967724446130}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &7609738967724446132 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: -3825101478798670469, guid: 9c75d30553e25e94693e750230cfa69c, type: 3}
+  m_PrefabInstance: {fileID: 7609738967724446130}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1627be5801a72948a68a39c40254430, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

@@ -24,6 +24,8 @@ public enum KeyPromptColor
 
 public class KeyPrompt : MonoBehaviour
 {
+    [SerializeField] KeyVisual visual;
+
     private RectTransform rectTransform;
 
     public KeyPromptType PromptType { get; private set; }
@@ -42,6 +44,8 @@ public class KeyPrompt : MonoBehaviour
         }
     }
 
+    public KeyboardVisual Keyboard { get; set; }
+
     public void SetPrompt(KeyPromptType type, Key key, KeyPromptColor color)
     {
         PromptType = type;
@@ -49,6 +53,44 @@ public class KeyPrompt : MonoBehaviour
         PromptColor = color;
 
         // Setup Visuals Here..
+        if (key != Key.None)
+        {
+            visual.gameObject.SetActive(true);
+            visual.SetKey(key);
+            if (Keyboard.TryGetKeyVisual(key, out var keyVisual))
+            {
+                visual.transform.position = new Vector3(
+                    keyVisual.transform.position.x - keyVisual.GetComponent<RectTransform>().rect.width * 0.5f,
+                    visual.transform.position.y,
+                    visual.transform.position.z
+                );
+
+                var rVisual = visual.GetComponent<RectTransform>();
+                var rKeyVisual = keyVisual.GetComponent<RectTransform>();
+
+                
+
+                Debug.Log($"{rVisual.rect.height}, {rKeyVisual.rect.height}");
+                // var offset = (rVisual.rect.height - rKeyVisual.rect.height) * 0.5f;
+                
+                rVisual.anchorMax = new Vector2(0f, 0.5f);
+                rVisual.anchorMin = new Vector2(0f, 0.5f);
+                rVisual.pivot = new Vector2(0f, 0.5f);
+                rVisual.anchoredPosition = new Vector2(rVisual.anchoredPosition.x, 0);
+                rVisual.sizeDelta = rKeyVisual.sizeDelta;
+
+                rVisual.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, rKeyVisual.rect.width);
+                rVisual.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, rKeyVisual.rect.height);
+            }
+            else
+            {
+                Debug.LogWarning($"Failed to find key on keyboard for {key}");
+            }
+        }
+        else
+        {
+            visual.gameObject.SetActive(false);
+        }
     }
 
     public void SetAsKeyPrompt(Key key, bool isHold)

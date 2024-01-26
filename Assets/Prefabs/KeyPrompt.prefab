@@ -110,6 +110,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 346384d14ad61d242872acc34274c959, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  visual: {fileID: 8720415350319480434}
 --- !u!1001 &3562736977971125895
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -132,7 +133,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 909747841765530293, guid: 277ceceebb33d0b40bdc6d56fcaf5fa5, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 909747841765530293, guid: 277ceceebb33d0b40bdc6d56fcaf5fa5, type: 3}
       propertyPath: m_AnchorMin.x
@@ -140,7 +141,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 909747841765530293, guid: 277ceceebb33d0b40bdc6d56fcaf5fa5, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 1
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 909747841765530293, guid: 277ceceebb33d0b40bdc6d56fcaf5fa5, type: 3}
       propertyPath: m_SizeDelta.x
@@ -184,7 +185,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 909747841765530293, guid: 277ceceebb33d0b40bdc6d56fcaf5fa5, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 909747841765530293, guid: 277ceceebb33d0b40bdc6d56fcaf5fa5, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -212,3 +213,14 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 909747841765530293, guid: 277ceceebb33d0b40bdc6d56fcaf5fa5, type: 3}
   m_PrefabInstance: {fileID: 3562736977971125895}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &8720415350319480434 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: -4002501699008077579, guid: 277ceceebb33d0b40bdc6d56fcaf5fa5, type: 3}
+  m_PrefabInstance: {fileID: 3562736977971125895}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 19048cc36c31b54408563019b09bb257, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
