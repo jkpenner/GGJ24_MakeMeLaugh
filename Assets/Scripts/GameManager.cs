@@ -16,12 +16,11 @@ public class GameManager : MonoBehaviour {
         public KeyAction KeyAction;
     }
 
-   
-    void Start() {
+    private void Start() {
         StartCoroutine(SequenceToPerform());
     }
-    
-    IEnumerator SequenceToPerform() {
+
+    private IEnumerator SequenceToPerform() {
         for(int i = 0; i < keyActionsList.Count; i++) {
             yield return new WaitForSeconds(timeToSendNextMove);
             OnNewKeyAction?.Invoke(this, new OnNewKeyActionArgs {
