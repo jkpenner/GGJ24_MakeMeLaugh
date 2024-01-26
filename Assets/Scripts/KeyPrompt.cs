@@ -17,7 +17,7 @@ public enum KeyPromptType
 
 public enum KeyPromptColor
 {
-    None,
+    None     = 0,
     Yellow,
     Blue,
     Green,
