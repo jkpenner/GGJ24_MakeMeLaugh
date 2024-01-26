@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class KeyboardManager : MonoBehaviour {
     
@@ -27,6 +28,14 @@ public class KeyboardManager : MonoBehaviour {
         for (int i = 1; i < (int)Key.IMESelected; i++)
         {
             keys[i - 1] = (Key)i;
+        }
+
+        Color color = Color.white;
+        color.a = 0;
+        
+        foreach (Key key in keys) {
+            Debug.Log(key.ToString());
+            SetKeyColor(key, color);
         }
     }
 
@@ -84,5 +93,15 @@ public class KeyboardManager : MonoBehaviour {
         // foreach (Transform child in keyTransform) {
             Destroy(keyTransform.GetChild(0).gameObject);
         // }
+    }
+
+    void SetKeyColor(Key key, Color color) {
+        string keyName = key.ToString();
+        Transform keyTransform = keyboardKeysTransform.Find(keyName);
+        if (keyTransform == null) return;
+        Image image = keyTransform.GetComponent<Image>();
+        if (image != null) {
+            image.color = color;
+        }
     }
 }

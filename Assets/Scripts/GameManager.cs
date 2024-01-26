@@ -2,38 +2,34 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 
 public class GameManager : MonoBehaviour {
-    [SerializeField] private string[] sentences;
-    [SerializeField] private float timeToSendNextCharacter;
+    [SerializeField] private List<KeyObject.KeyColors> keyColors;
+    [SerializeField] private List<KeyObject.KeyTypes> keyTypes;
+    [SerializeField] private float timeToSendNextMove;
+    private KeyObject keyObject;
     
-    private string sentenceToType;
+    public static event EventHandler<OnNewKeyObjectArgs> OnNewKeyObject;
     
-    public static event EventHandler<OnNewCharArgs> OnNewChar;
-    
-    public class OnNewCharArgs : EventArgs {
-        public char newChar;
+    public class OnNewKeyObjectArgs : EventArgs {
+        public KeyObject.KeyTypes KeyType;
+        public KeyObject.KeyColors KeyColor;
     }
 
-    private void Awake() {
-        sentenceToType = sentences[Random.Range(0, sentences.Length - 1)];
-        Debug.Log(sentenceToType);
-    }
-
-    // Start is called before the first frame update
+   
     void Start() {
-        StartCoroutine(TypeSentence(sentenceToType));
+        StartCoroutine(SequenceToPerform());
     }
-    
-    IEnumerator TypeSentence(string sentence) {
-        foreach (char letter in sentence.ToCharArray()) {
-            yield return new WaitForSeconds(timeToSendNextCharacter);
-            OnNewChar?.Invoke(this, new OnNewCharArgs {
-                newChar = letter
+
+    IEnumerator SequenceToPerform() {
+        for(int i = 0; i < keyColors.Count; i++) {
+            yield return new WaitForSeconds(timeToSendNextMove);
+            OnNewKeyObject?.Invoke(this, new OnNewKeyObjectArgs {
+                KeyType = keyTypes[i],
+                KeyColor = keyColors[i]
             });
-            
         }
     }
-    
 }

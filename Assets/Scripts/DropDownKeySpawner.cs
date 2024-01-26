@@ -2,51 +2,31 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class DropDownKeySpawner : MonoBehaviour {
-    [SerializeField] private GameObject PresssedKeyDropDown;
-    [SerializeField] private List<Sprite> keySprites;
+    [SerializeField] private GameObject KeyDropDownPrefab;
     [SerializeField] private Transform keysTransform;
-    private KeysUtil KeysUtil;
-
+    [SerializeField] private Transform spawnPoint;
+    
+    private GameObject canvas;
+    
     private void Awake() {
-        KeysUtil = GetComponent<KeysUtil>();
+        canvas = GameObject.Find("Canvas");
     }
-
-
+    
     private void OnEnable() {
-        GameManager.OnNewChar += OnNewChar;
+        GameManager.OnNewKeyObject += OnNewKeyObject;
     }
     
     private void OnDisable() {
-        GameManager.OnNewChar -= OnNewChar;
+        GameManager.OnNewKeyObject -= OnNewKeyObject;
     }
     
-    private void OnNewChar(object sender, GameManager.OnNewCharArgs e) {
-        MapCharToSprite(e.newChar); 
+    private void OnNewKeyObject(object sender, GameManager.OnNewKeyObjectArgs e) {
+        GameObject dropDownGameObject = Instantiate(KeyDropDownPrefab, spawnPoint.position, Quaternion.identity);
+        dropDownGameObject.GetComponent<DropDownKey>().SetKey(e.KeyType, e.KeyColor);
+        dropDownGameObject.transform.SetParent(canvas.transform);
     }
     
-    private void MapCharToSprite(char newChar) {
-       
-        Sprite sprite = KeysUtil.GetSpriteFromKey(newChar.ToString());
-        if (sprite == null) {
-            Debug.LogWarning($"No sprite found for {newChar}");
-            return;
-        }
-        Debug.Log(sprite.name);
-        
-        //Transform keyTransform = GetKeyTransform(keyboardKeyName);
-        //Debug.Log(keyTransform);
-        //TODO: Get position of key
-        
-    }
-    
-    private Transform GetKeyTransform(string keyboardKeyName) {
-        Transform keyTransform = keysTransform.Find(keyboardKeyName);
-        if (keyTransform == null) {
-            Debug.LogWarning($"Key {keyboardKeyName} not found");
-            return null;
-        }
-        return keyTransform;
-    }
 }
