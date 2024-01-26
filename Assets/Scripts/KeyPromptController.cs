@@ -29,10 +29,24 @@ public class KeyPromptController : MonoBehaviour
         instance.RectTransform.anchorMax = new Vector2(1f, 0f);
         instance.RectTransform.anchoredPosition = new Vector2(0f, rectTransform.rect.height);
         instance.RectTransform.sizeDelta = new Vector2(0f, instance.RectTransform.sizeDelta.y);
-
-        var key = (Key)Random.Range((int)Key.Space, (int)Key.Digit0);
         instance.Keyboard = keyboard;
-        instance.SetAsKeyPrompt(key, false);
+
+        var rand = Random.Range(0, 3);
+        if (rand == 0)
+        {
+            var key = (Key)Random.Range((int)Key.Space, (int)Key.Digit0);
+            instance.SetAsKeyPrompt(key, false);
+        }
+        else if (rand == 1)
+        {
+            instance.SetAsColorPrompt((KeyPromptColor)Random.Range(1, 4), false);
+        }
+        else
+        {
+            instance.SetAsRandomizePrompt();
+        }
+
+
 
         prompts.Add(instance);
     }

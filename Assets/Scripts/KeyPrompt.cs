@@ -1,4 +1,6 @@
+
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.InputSystem;
 
 public enum KeyPromptType
@@ -24,7 +26,9 @@ public enum KeyPromptColor
 
 public class KeyPrompt : MonoBehaviour
 {
-    [SerializeField] KeyVisual visual;
+    [SerializeField] KeyVisual keyPrompt;
+    [SerializeField] Image colorPrompt;
+    [SerializeField] GameObject randomizerPrompt;
 
     private RectTransform rectTransform;
 
@@ -52,44 +56,64 @@ public class KeyPrompt : MonoBehaviour
         PromptKey = key;
         PromptColor = color;
 
-        // Setup Visuals Here..
-        if (key != Key.None)
+        keyPrompt.gameObject.SetActive(false);
+        colorPrompt.gameObject.SetActive(false);
+        randomizerPrompt.gameObject.SetActive(false);
+
+        if (PromptType == KeyPromptType.Randomize)
         {
-            visual.gameObject.SetActive(true);
-            visual.SetKey(key);
-            if (Keyboard.TryGetKeyVisual(key, out var keyVisual))
+            randomizerPrompt.gameObject.SetActive(true);
+        }
+        else if (PromptType == KeyPromptType.Color || PromptType == KeyPromptType.ColorHold || PromptType == KeyPromptType.ColorRelease)
+        {
+            colorPrompt.gameObject.SetActive(true);
+            colorPrompt.color = color switch {
+                KeyPromptColor.Yellow => Color.yellow,
+                KeyPromptColor.Blue => Color.blue,
+                KeyPromptColor.Green => Color.green,
+                KeyPromptColor.Red => Color.red,
+                _ => Color.magenta,
+            };
+        }
+        else if (PromptType == KeyPromptType.Key || PromptType == KeyPromptType.KeyHold || PromptType == KeyPromptType.KeyRelease)
+        {
+            // Setup Visuals Here..
+            if (key != Key.None)
             {
-                visual.transform.position = new Vector3(
-                    keyVisual.transform.position.x - keyVisual.GetComponent<RectTransform>().rect.width * 0.5f,
-                    visual.transform.position.y,
-                    visual.transform.position.z
-                );
+                keyPrompt.gameObject.SetActive(true);
+                keyPrompt.SetKey(key);
+                if (Keyboard.TryGetKeyVisual(key, out var keyVisual))
+                {
+                    keyPrompt.transform.position = new Vector3(
+                        keyVisual.transform.position.x - keyVisual.GetComponent<RectTransform>().rect.width * 0.5f,
+                        keyPrompt.transform.position.y,
+                        keyPrompt.transform.position.z
+                    );
 
-                var rVisual = visual.GetComponent<RectTransform>();
-                var rKeyVisual = keyVisual.GetComponent<RectTransform>();
+                    var rVisual = keyPrompt.GetComponent<RectTransform>();
+                    var rKeyVisual = keyVisual.GetComponent<RectTransform>();
 
-                
+                    Debug.Log($"{rVisual.rect.height}, {rKeyVisual.rect.height}");
+                    // var offset = (rVisual.rect.height - rKeyVisual.rect.height) * 0.5f;
 
-                Debug.Log($"{rVisual.rect.height}, {rKeyVisual.rect.height}");
-                // var offset = (rVisual.rect.height - rKeyVisual.rect.height) * 0.5f;
-                
-                rVisual.anchorMax = new Vector2(0f, 0.5f);
-                rVisual.anchorMin = new Vector2(0f, 0.5f);
-                rVisual.pivot = new Vector2(0f, 0.5f);
-                rVisual.anchoredPosition = new Vector2(rVisual.anchoredPosition.x, 0);
-                rVisual.sizeDelta = rKeyVisual.sizeDelta;
+                    rVisual.anchorMax = new Vector2(0f, 0.5f);
+                    rVisual.anchorMin = new Vector2(0f, 0.5f);
+                    rVisual.pivot = new Vector2(0f, 0.5f);
+                    rVisual.anchoredPosition = new Vector2(rVisual.anchoredPosition.x, 0);
+                    rVisual.sizeDelta = rKeyVisual.sizeDelta;
 
-                rVisual.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, rKeyVisual.rect.width);
-                rVisual.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, rKeyVisual.rect.height);
+                    rVisual.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, rKeyVisual.rect.width);
+                    rVisual.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, rKeyVisual.rect.height);
+                }
+                else
+                {
+                    Debug.LogWarning($"Failed to find key on keyboard for {key}");
+                }
             }
             else
             {
-                Debug.LogWarning($"Failed to find key on keyboard for {key}");
+                keyPrompt.gameObject.SetActive(false);
             }
-        }
-        else
-        {
-            visual.gameObject.SetActive(false);
         }
     }
 
