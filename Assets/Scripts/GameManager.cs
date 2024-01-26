@@ -8,10 +8,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] TextAsset wordsAsset;
     [SerializeField] KeyPromptController prompts;
     [SerializeField] KeyboardVisual visual;
-    [SerializeField] Key[] redKeys;
-    [SerializeField] Key[] greenKeys;
-    [SerializeField] Key[] blueKeys;
-    [SerializeField] Key[] yellowKeys;
+    [SerializeField] KeyColorLayoutsScriptableObject keyColorLayouts;
 
     Keyboard current;
     Key[] keys;
@@ -40,10 +37,10 @@ public class GameManager : MonoBehaviour
     }
 
     private void Start() {
-        SetKeyboardColors(redKeys, Color.red);
-        SetKeyboardColors(greenKeys, Color.green);
-        SetKeyboardColors(blueKeys, Color.blue);
-        SetKeyboardColors(yellowKeys, Color.yellow);
+        SetKeyboardColors(keyColorLayouts.redKeys, Color.red);
+        SetKeyboardColors(keyColorLayouts.greenKeys, Color.green);
+        SetKeyboardColors(keyColorLayouts.blueKeys, Color.blue);
+        SetKeyboardColors(keyColorLayouts.yellowKeys, Color.yellow);
     }
 
     private void Update()
