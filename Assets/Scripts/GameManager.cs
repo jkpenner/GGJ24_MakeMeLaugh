@@ -1,14 +1,19 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class GameManager : MonoBehaviour
 {
+    [SerializeField] TextAsset wordsAsset;
     [SerializeField] KeyPromptController prompts;
     [SerializeField] KeyboardVisual visual;
 
     Keyboard current;
     Key[] keys;
 
+    string[] words;
+    int wordIndex = 0;
+    int letterIndex = 0;
 
     private void Awake()
     {
@@ -23,27 +28,58 @@ public class GameManager : MonoBehaviour
         {
             keys[i - 1] = (Key)i;
         }
+
+        if (wordsAsset is not null)
+        {
+            words = wordsAsset.text.Split("\n");
+        }
+        else
+        {
+            words = new string[] { "Hello", "World!" };
+        }
     }
 
     private void Update()
     {
-        if (prompts.PromptCount < 6)
+        if (prompts.PromptCount < 6 && wordIndex < words.Length)
         {
-            var prompt = prompts.SpawnKeyPrompt();
-            var rand = Random.Range(0, 1);
-            if (rand == 0)
+            var letter = words[wordIndex][letterIndex];
+
+            letterIndex += 1;
+            if (letterIndex >= words[wordIndex].Length)
             {
-                var key = (Key)Random.Range((int)Key.Space, (int)Key.Digit0);
-                prompt.SetAsKeyPrompt(key, false);
+                letterIndex = 0;
+
+                wordIndex += 1;
+                if (wordIndex >= words.Length)
+                {
+                    Debug.Log("Game Won!");
+                }
             }
-            else if (rand == 1)
+            
+            if (System.Enum.TryParse(letter.ToString(), true, out Key key))
             {
-                prompt.SetAsColorPrompt((KeyPromptColor)Random.Range(1, 4), false);
+                var prompt = prompts.SpawnKeyPrompt();
+                prompt.SetAsKeyPrompt(key, false);
             }
             else
             {
-                prompt.SetAsRandomizePrompt();
+                Debug.Log($"Failed to parse letter to key ({letter})");
             }
+
+            // var rand = Random.Range(0, 1);
+            // if (rand == 0)
+            // {
+
+            // }
+            // else if (rand == 1)
+            // {
+            //     prompt.SetAsColorPrompt((KeyPromptColor)Random.Range(1, 4), false);
+            // }
+            // else
+            // {
+            //     prompt.SetAsRandomizePrompt();
+            // }
         }
 
 
