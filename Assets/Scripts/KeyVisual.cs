@@ -1,4 +1,5 @@
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -13,6 +14,7 @@ public class KeyVisual : MonoBehaviour
     private Image image;
 
     public bool IsPressed { get; private set; }
+    public KeyPromptColor PromptColor { get; private set; }
 
     private void Awake() {
         image = GetComponent<Image>();
@@ -49,10 +51,21 @@ public class KeyVisual : MonoBehaviour
             _ => key.ToString()
         };
     }
+
+    public void SetPromptColor(KeyPromptColor color)
+    {
+        PromptColor = color;
+        image.color = color switch {
+            KeyPromptColor.Yellow => Color.yellow,
+            KeyPromptColor.Blue => Color.blue,
+            KeyPromptColor.Green => Color.green,
+            KeyPromptColor.Red => Color.red,
+            _ => Color.magenta
+        };
+    }
     
     public void SetColor(Color color)
     {
-        Debug.Log("Setting color: " + color);
         image.color = color;
     }
 

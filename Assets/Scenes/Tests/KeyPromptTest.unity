@@ -364,6 +364,12 @@ MonoBehaviour:
   prompts: {fileID: 375028136}
   visual: {fileID: 7609738967724446132}
   keyColorLayouts: {fileID: 11400000, guid: c0d6e8933a6bd5549bb861ff3cf8d2da, type: 2}
+  sequence:
+    steps: []
+    CurrentIndex: 0
+  maxActivePrompts: 1
+  maxKeysHeldAtOnce: 3
+  maxLettersBetweenHolds: 5
 --- !u!4 &1657106606
 Transform:
   m_ObjectHideFlags: 0
@@ -557,7 +563,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 211828829723269511, guid: 795c6f30ef67b8648a8d45bf366281d4, type: 3}
       propertyPath: keyPromptDropSpeed
-      value: 1000
+      value: 400
       objectReference: {fileID: 0}
     - target: {fileID: 2563912849379972105, guid: 795c6f30ef67b8648a8d45bf366281d4, type: 3}
       propertyPath: m_Pivot.x
