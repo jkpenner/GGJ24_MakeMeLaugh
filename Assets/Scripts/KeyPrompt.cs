@@ -2,6 +2,9 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
+using System.Reflection.Emit;
+using TMPro;
+using System;
 
 public enum KeyPromptType
 {
@@ -17,7 +20,7 @@ public enum KeyPromptType
 
 public enum KeyPromptColor
 {
-    None     = 0,
+    None = 0,
     Yellow,
     Blue,
     Green,
@@ -29,12 +32,12 @@ public class KeyPrompt : MonoBehaviour
     [SerializeField] KeyVisual keyPrompt;
     [SerializeField] Image colorPrompt;
     [SerializeField] GameObject randomizerPrompt;
+    [SerializeField] TMP_Text holdText;
 
     private RectTransform rectTransform;
 
-    public KeyPromptType PromptType { get; private set; }
-    public Key PromptKey { get; private set; }
-    public KeyPromptColor PromptColor { get; private set; }
+    public int StepIndex { get; private set; }
+    public KeySequenceStep Step { get; private set; }
 
     public RectTransform RectTransform
     {
@@ -50,95 +53,98 @@ public class KeyPrompt : MonoBehaviour
 
     public KeyboardVisual Keyboard { get; set; }
 
-    public void SetPrompt(KeyPromptType type, Key key, KeyPromptColor color)
+    public void Setup(KeySequenceStep step, int stepIndex)
     {
-        PromptType = type;
-        PromptKey = key;
-        PromptColor = color;
+        Step = step;
+        StepIndex = stepIndex;
 
-        keyPrompt.gameObject.SetActive(false);
+        switch (Step.Type)
+        {
+            case StepType.Key:
+                SetupKeyPrompt();
+                break;
+            case StepType.Color:
+                SetupColorPrompt();
+                break;
+            case StepType.Randomizer:
+                SetupRandomizerPrompt();
+                break;
+        }
+    }
+
+    private void SetupKeyPrompt()
+    {
+        // Hide all unneeded elements.
         colorPrompt.gameObject.SetActive(false);
         randomizerPrompt.gameObject.SetActive(false);
 
-        if (PromptType == KeyPromptType.Randomize)
+        // Show required elements.
+        keyPrompt.gameObject.SetActive(true);
+
+        // Show/Hide hold text with correct state text.
+        holdText.gameObject.SetActive(Step.HoldType != HoldType.None);
+        holdText.text = Step.HoldType == HoldType.Hold ? "Hold" : "Release";
+
+        keyPrompt.SetKey(Step.Key);
+
+        // Search for the target key on the keyboard visual, then match it's size.
+        if (Keyboard.TryGetKeyVisual(Step.Key, out var keyVisual))
         {
-            randomizerPrompt.gameObject.SetActive(true);
+            keyPrompt.transform.position = new Vector3(
+                keyVisual.transform.position.x - keyVisual.GetComponent<RectTransform>().rect.width * 0.5f,
+                keyPrompt.transform.position.y,
+                keyPrompt.transform.position.z
+            );
+
+            var rVisual = keyPrompt.GetComponent<RectTransform>();
+            var rKeyVisual = keyVisual.GetComponent<RectTransform>();
+
+            rVisual.anchorMax = new Vector2(0f, 0.5f);
+            rVisual.anchorMin = new Vector2(0f, 0.5f);
+            rVisual.pivot = new Vector2(0f, 0.5f);
+            rVisual.anchoredPosition = new Vector2(rVisual.anchoredPosition.x, 0);
+            rVisual.sizeDelta = rKeyVisual.sizeDelta;
+
+            rVisual.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, rKeyVisual.rect.width);
+            rVisual.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, rKeyVisual.rect.height);
         }
-        else if (PromptType == KeyPromptType.Color || PromptType == KeyPromptType.ColorHold || PromptType == KeyPromptType.ColorRelease)
+        else
         {
-            colorPrompt.gameObject.SetActive(true);
-            colorPrompt.color = color switch {
-                KeyPromptColor.Yellow => Color.yellow,
-                KeyPromptColor.Blue => Color.blue,
-                KeyPromptColor.Green => Color.green,
-                KeyPromptColor.Red => Color.red,
-                _ => Color.magenta,
-            };
-        }
-        else if (PromptType == KeyPromptType.Key || PromptType == KeyPromptType.KeyHold || PromptType == KeyPromptType.KeyRelease)
-        {
-            // Setup Visuals Here..
-            if (key != Key.None)
-            {
-                keyPrompt.gameObject.SetActive(true);
-                keyPrompt.SetKey(key);
-                if (Keyboard.TryGetKeyVisual(key, out var keyVisual))
-                {
-                    keyPrompt.transform.position = new Vector3(
-                        keyVisual.transform.position.x - keyVisual.GetComponent<RectTransform>().rect.width * 0.5f,
-                        keyPrompt.transform.position.y,
-                        keyPrompt.transform.position.z
-                    );
-
-                    var rVisual = keyPrompt.GetComponent<RectTransform>();
-                    var rKeyVisual = keyVisual.GetComponent<RectTransform>();
-
-                    Debug.Log($"{rVisual.rect.height}, {rKeyVisual.rect.height}");
-                    // var offset = (rVisual.rect.height - rKeyVisual.rect.height) * 0.5f;
-
-                    rVisual.anchorMax = new Vector2(0f, 0.5f);
-                    rVisual.anchorMin = new Vector2(0f, 0.5f);
-                    rVisual.pivot = new Vector2(0f, 0.5f);
-                    rVisual.anchoredPosition = new Vector2(rVisual.anchoredPosition.x, 0);
-                    rVisual.sizeDelta = rKeyVisual.sizeDelta;
-
-                    rVisual.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, rKeyVisual.rect.width);
-                    rVisual.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, rKeyVisual.rect.height);
-                }
-                else
-                {
-                    Debug.LogWarning($"Failed to find key on keyboard for {key}");
-                }
-            }
-            else
-            {
-                keyPrompt.gameObject.SetActive(false);
-            }
+            Debug.LogWarning($"Failed to find key on keyboard for {Step.Key}");
         }
     }
 
-    public void SetAsKeyPrompt(Key key, bool isHold)
+    private void SetupColorPrompt()
     {
-        SetPrompt(isHold ? KeyPromptType.KeyHold : KeyPromptType.Key, key, KeyPromptColor.None);
+        // Hide all unneeded elements.
+        randomizerPrompt.gameObject.SetActive(false);
+        keyPrompt.gameObject.SetActive(false);
+
+        // Show required elements.
+        colorPrompt.gameObject.SetActive(true);
+
+        // Show/Hide hold text with correct state text.
+        holdText.gameObject.SetActive(Step.HoldType != HoldType.None);
+        holdText.text = Step.HoldType == HoldType.Hold ? "Hold" : "Release";
+
+        colorPrompt.color = Step.Color switch
+        {
+            KeyPromptColor.Yellow => Color.yellow,
+            KeyPromptColor.Blue => Color.blue,
+            KeyPromptColor.Green => Color.green,
+            KeyPromptColor.Red => Color.red,
+            _ => Color.magenta,
+        };
     }
 
-    public void SetAsKeyReleasePrompt(Key key)
+    private void SetupRandomizerPrompt()
     {
-        SetPrompt(KeyPromptType.KeyRelease, key, KeyPromptColor.None);
-    }
+        // Hide all unneeded elements.
+        keyPrompt.gameObject.SetActive(false);
+        colorPrompt.gameObject.SetActive(false);
+        holdText.gameObject.SetActive(false);
 
-    public void SetAsColorPrompt(KeyPromptColor color, bool isHold)
-    {
-        SetPrompt(isHold ? KeyPromptType.ColorHold : KeyPromptType.Color, Key.None, color);
-    }
-
-    public void SetAsColorReleasePrompt(KeyPromptColor color)
-    {
-        SetPrompt(KeyPromptType.ColorRelease, Key.None, color);
-    }
-
-    public void SetAsRandomizePrompt()
-    {
-        SetPrompt(KeyPromptType.Randomize, Key.None, KeyPromptColor.None);
+        // Show required elements.
+        randomizerPrompt.gameObject.SetActive(true);
     }
 }

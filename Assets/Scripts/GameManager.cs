@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,20 +11,19 @@ public class GameManager : MonoBehaviour
     [SerializeField] KeyboardVisual visual;
     [SerializeField] KeyColorLayoutsScriptableObject keyColorLayouts;
 
+    private KeySequenceGenerator generator;
+    public KeySequence sequence;
+
     Keyboard current;
     Key[] keys;
 
-    string[] words;
-    int wordIndex = 0;
-    int letterIndex = 0;
-
-    int maxKeysHeldAtOnce = 3;
-    int maxLettersBetweenHolds = 5;
-    HashSet<char> heldLetters = new HashSet<char>();
-    HashSet<char> releasePrompts = new HashSet<char>();
-
+    HashSet<Key> heldKeys = new HashSet<Key>();
+    Key heldColorKey = Key.None;
     KeyPromptColor heldColor = KeyPromptColor.None;
-    bool hasReleasePrompt = false;
+
+    [SerializeField] int maxActivePrompts = 1;
+    [SerializeField] int maxKeysHeldAtOnce = 3;
+    [SerializeField] int maxLettersBetweenHolds = 6;
 
     private void Awake()
     {
@@ -41,11 +41,15 @@ public class GameManager : MonoBehaviour
 
         if (wordsAsset is not null)
         {
-            words = wordsAsset.text.Split("\n");
+            var words = wordsAsset.text.Split("\n");
+            generator = new KeySequenceGenerator(words);
+            generator.MaxKeysHeldAtOnce = maxKeysHeldAtOnce;
+            generator.MaxLettersBetweenHolds = maxLettersBetweenHolds;
+            sequence = generator.Generate();
         }
         else
         {
-            words = new string[] { "Hello", "World!" };
+            Debug.LogError("No Word Asset assigned.");
         }
     }
 
@@ -59,122 +63,29 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
-        if (prompts.PromptCount < 6 && wordIndex < words.Length)
+        if (!sequence.IsComplete && prompts.PromptCount < maxActivePrompts)
         {
-            var letter = words[wordIndex][letterIndex];
-
-
-            letterIndex += 1;
-
-            // Check for just pass the word length. When letter index
-            // is equal to the word length assume that is a color
-            // or randomizer prompt.
-            if (letterIndex > words[wordIndex].Length)
-            {
-                letterIndex = 0;
-                wordIndex += 1;
-                if (wordIndex >= words.Length)
-                {
-                    Debug.Log("Game Won!");
-                }
-            }
-
-            if (letterIndex < words[wordIndex].Length)
-            {
-                if (System.Enum.TryParse(letter.ToString(), true, out Key key))
-                {
-                    var prompt = prompts.SpawnKeyPrompt();
-                    if (heldLetters.Contains(letter) && !releasePrompts.Contains(letter))
-                    {
-                        prompt.SetAsKeyReleasePrompt(key);
-                        releasePrompts.Add(letter);
-                    }
-                    else if (CheckIfLetterShouldBeHeld(wordIndex, letterIndex))
-                    {
-                        prompt.SetAsKeyPrompt(key, true);
-                    }
-                    else
-                    {
-                        prompt.SetAsKeyPrompt(key, false);
-                    }
-                }
-                else
-                {
-                    Debug.Log($"Failed to parse letter to key ({letter})");
-                }
-            }
-            else // End of a word time for a color or randomizer
-            {
-                var prompt = prompts.SpawnKeyPrompt();
-                if (heldColor != KeyPromptColor.None && !hasReleasePrompt)
-                {
-                    prompt.SetAsColorReleasePrompt(heldColor);
-                }
-                else
-                {
-                    if (Random.Range(0f, 1f) <= 0.8f)
-                    {
-                        var color = (KeyPromptColor)Random.Range(1, 5);
-                        var isHeld = !hasReleasePrompt && Random.Range(0, 2) == 0;
-
-                        prompt.SetAsColorPrompt(color, isHeld);
-                        if (isHeld)
-                        {
-                            heldColor = color;
-                        }
-                    }
-                    else
-                    {
-                        prompt.SetAsRandomizePrompt();
-                    }
-                }
-            }
-
-            // var rand = Random.Range(0, 1);
-            // if (rand == 0)
-            // {
-
-            // }
-            // else if (rand == 1)
-            // {
-            //     prompt.SetAsColorPrompt((KeyPromptColor)Random.Range(1, 4), false);
-            // }
-            // else
-            // {
-            //     prompt.SetAsRandomizePrompt();
-            // }
+            SpawnPromptFromSequence();
         }
 
+        ProcessKeyEvents();
+    }
 
+    private void ProcessKeyEvents()
+    {
         foreach (Key key in keys)
         {
             try
             {
                 if (current[key].wasPressedThisFrame)
                 {
-                    var prompt = prompts.CurrentPrompt;
-                    if (prompt is not null)
-                    {
-                        if (key == prompt.PromptKey)
-                        {
-                            prompts.DespawnKeyPrompt();
-                        }
-                    }
-
-                    if (visual.TryGetKeyVisual(key, out KeyVisual keyVisual))
-                    {
-                        keyVisual.SetPressed(true);
-                    }
+                    OnKeyPressEvent(key);
                 }
 
                 if (current[key].wasReleasedThisFrame)
                 {
-                    if (visual.TryGetKeyVisual(key, out KeyVisual keyVisual))
-                    {
-                        keyVisual.SetPressed(false);
-                    }
+                    OnKeyReleaseEvent(key);
                 }
-
             }
             catch
             {
@@ -183,48 +94,169 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private bool CheckIfLetterShouldBeHeld(int wordIndex, int letterIndex)
+    private void OnKeyPressEvent(Key key)
     {
-        
-
-        if (wordIndex >= words.Length || letterIndex >= words[wordIndex].Length)
+        if (visual.TryGetKeyVisual(key, out KeyVisual keyVisual))
         {
-            return false;
+            keyVisual.SetPressed(true);
         }
 
-        int heldKeys = heldLetters.Count + heldColor != KeyPromptColor.None ? 1 : 0;
-        if (heldKeys >= maxKeysHeldAtOnce)
+        var prompt = prompts.CurrentPrompt;
+        if (prompt is null)
         {
-            return false;
+            return;
         }
 
-        int distance = 0;
-        char letter = words[wordIndex][letterIndex];
-
-        if (heldLetters.Contains(letter))
+        var step = sequence.GetStep(prompt.StepIndex);
+        if (step is null)
         {
-            return false;
+            return;
         }
 
-        for (int i = wordIndex; i < words.Length; i++)
+        if (step.Type == StepType.Key)
         {
-            for (int j = letterIndex; j < words[wordIndex].Length; j++)
+            ProcessKeyStepPressEvent(key, step, prompt);
+        }
+        else if (step.Type == StepType.Color)
+        {
+            ProcessColorStepPressEvent(key, step, prompt);
+        }
+    }
+
+    private void ProcessKeyStepPressEvent(Key key, KeySequenceStep step, KeyPrompt prompt)
+    {
+        if (step.Type == StepType.Key && step.Key == key)
+        {
+            if (step.HoldType == HoldType.Hold)
             {
-                distance += 1;
-                if (distance >= maxLettersBetweenHolds)
-                {
-                    return false;
-                }
-
-                if (letter == words[wordIndex][letterIndex])
-                {
-                    return true;
-                }
+                heldKeys.Add(key);
             }
-            letterIndex = 0;
+
+            // Todo: Play successful hit animation.
+        }
+        else
+        {
+            Debug.Log("Hit the wrong key for the prompt");
+            // Todo: Play failed hit animation.
         }
 
-        return false;
+        prompts.DespawnKeyPrompt();
+        sequence.MoveToNextStep();
+    }
+
+    private void ProcessColorStepPressEvent(Key key, KeySequenceStep step, KeyPrompt prompt)
+    {
+        var keyVisual = visual.GetKeyVisual(key);
+        if (keyVisual is null)
+        {
+            Debug.LogError($"Failed to find key visual for {key}");
+            prompts.DespawnKeyPrompt();
+            sequence.MoveToNextStep();
+            return;
+        }
+
+        if (step.Type == StepType.Color && step.Color == keyVisual.PromptColor)
+        {
+            if (step.HoldType == HoldType.Hold)
+            {
+                heldColor = step.Color;
+                heldColorKey = key;
+            }
+            // Todo: Play successful hit animation.
+        }
+        else
+        {
+            Debug.Log("Hit the wrong color for the prompt");
+            // Todo: Play failed hit animation.
+
+        }
+
+        prompts.DespawnKeyPrompt();
+        sequence.MoveToNextStep();
+    }
+
+    private void OnKeyReleaseEvent(Key key)
+    {
+        if (visual.TryGetKeyVisual(key, out KeyVisual keyVisual))
+        {
+            keyVisual.SetPressed(false);
+        }
+
+        if (!heldKeys.Contains(key) && heldColorKey != key)
+        {
+            return;
+        }
+
+        // if not removed from held its it is the held color key.
+        if (!heldKeys.Remove(key))
+        {
+            heldColor = KeyPromptColor.None;
+            heldColorKey = Key.None;
+        }
+
+        var prompt = prompts.CurrentPrompt;
+        if (prompt is null)
+        {
+            return;
+        }
+
+        var step = sequence.GetStep(prompt.StepIndex);
+        if (step is null || step.HoldType != HoldType.Release)
+        {
+            return;
+        }
+
+        if (step.Type == StepType.Key)
+        {
+            ProcessKeyStepReleaseEvent(key, step, prompt);
+        }
+        else if (step.Type == StepType.Color)
+        {
+            ProcessColorStepReleaseEvent(key, step, prompt);
+        }
+    }
+
+    private void ProcessKeyStepReleaseEvent(Key key, KeySequenceStep step, KeyPrompt prompt)
+    {
+        if (step.Key == key && step.HoldType == HoldType.Release)
+        {
+            // Todo: Play successful hit animation.
+
+            prompts.DespawnKeyPrompt();
+            sequence.MoveToNextStep();
+        }
+        else
+        {
+            Debug.Log("Release key at the wrong time");
+            // Todo: Play failed hit animation on the correct prompt.
+        }
+    }
+
+    private void ProcessColorStepReleaseEvent(Key key, KeySequenceStep step, KeyPrompt prompt)
+    {
+        if (step.Color == heldColor && step.HoldType == HoldType.Release)
+        {
+            // Todo: Play successful hit animation.
+
+            prompts.DespawnKeyPrompt();
+            sequence.MoveToNextStep();
+        }
+        else
+        {
+            Debug.Log("Release color key at the wrong time");
+            // Todo: Play failed hit animation on the correct prompt.
+        }
+    }
+
+    private void SpawnPromptFromSequence()
+    {
+        var stepIndex = sequence.CurrentIndex + prompts.PromptCount;
+        var step = sequence.GetStep(stepIndex);
+
+        if (step is not null)
+        {
+            prompts.SpawnKeyPrompt().Setup(step, stepIndex);
+        }
     }
 
     void SetKeyboardColors(Key[] keys, Color color)
