@@ -94,6 +94,8 @@ public class KeySequenceManager : MonoBehaviour
             sequence = new KeySequence();
         }
 
+        Debug.Log("Regenerating sequence.");
+
         // Update generator values prior to update
         generator.MaxLettersBetweenHolds = maxLettersBetweenHolds;
         generator.MaxKeysHeldAtOnce = maxKeysHeldAtOnce;
@@ -146,12 +148,7 @@ public class KeySequenceManager : MonoBehaviour
         return step.Type == StepType.Color && step.Color == color;
     }
 
-    /// <summary>
-    /// Sets the current step as completed, based on the given key and
-    /// color combination it will mark the step as either completed 
-    /// successfully or failed.
-    /// </summary>
-    public void MarkStepCompleted(Key key, KeyPromptColor color)
+    public void HandlePressEvent(Key key, KeyPromptColor color)
     {
         if (sequence is null || sequence.IsComplete)
         {
@@ -166,9 +163,11 @@ public class KeySequenceManager : MonoBehaviour
 
         if (step.Type == StepType.Key)
         {
-            if (IsValidKeyInput(key))
+            if (IsValidKeyInput(key) && step.HoldType != HoldType.Release)
             {
+                Debug.Log($"Key ({step.Key}) hit successfully");
                 step.MarkSucceeded();
+
                 if (step.HoldType == HoldType.Hold)
                 {
                     sequence.MarkKeyAsHeld(key);
@@ -176,6 +175,8 @@ public class KeySequenceManager : MonoBehaviour
             }
             else
             {
+                Debug.Log($"Hit invalided key (Hit {key} expected {step.Key})");
+
                 step.MarkFailed();
                 if (step.HoldType == HoldType.Hold)
                 {
@@ -183,18 +184,15 @@ public class KeySequenceManager : MonoBehaviour
                     isDirty = true;
                 }
             }
-
-            if (step.HoldType == HoldType.Release)
-            {
-                sequence.MarkKeyAsReleased(key);
-            }
         }
         else if (step.Type == StepType.Color)
         {
-            if (IsValidColorInput(color))
+            if (IsValidColorInput(color) && step.HoldType != HoldType.Release)
             {
                 step.Key = key;
                 step.MarkSucceeded();
+
+                Debug.Log($"Color ({step.Color}) hit successfully");
 
                 if (step.HoldType == HoldType.Hold)
                 {
@@ -205,17 +203,13 @@ public class KeySequenceManager : MonoBehaviour
             }
             else
             {
+                Debug.Log($"Hit invalided color (Hit {color} expected {step.Color})");
                 step.MarkFailed();
                 if (step.HoldType == HoldType.Hold)
                 {
                     // Missed a color hold update sequence.
                     isDirty = true;
                 }
-            }
-
-            if (step.HoldType == HoldType.Release)
-            {
-                sequence.MarkColorAsReleased(color, key);
             }
         }
         else
@@ -227,6 +221,63 @@ public class KeySequenceManager : MonoBehaviour
 
         Regenerate(); // Only regens if dirty
         MoveToNextStep();
+    }
+
+    public void HandleReleaseEvent(Key key, KeyPromptColor color)
+    {
+        if (sequence is null || sequence.IsComplete)
+        {
+            return;
+        }
+
+        var step = sequence.GetCurrentStep();
+        if (step is null)
+        {
+            return;
+        }
+
+        if (step.Type == StepType.Key)
+        {
+            if (IsValidKeyInput(key) && step.HoldType == HoldType.Release)
+            {
+                Debug.Log($"Successfully released {step.Key}");
+                step.MarkSucceeded();
+
+            }
+            else if (sequence.State.IsKeyHeld(key))
+            {
+                isDirty = true;
+                Debug.Log("Released a held key before it was time");
+            }
+
+            sequence.MarkKeyAsReleased(key);
+        }
+        else if (step.Type == StepType.Color)
+        {
+            if (IsValidColorInput(color))
+            {
+                step.MarkSucceeded();
+                Debug.Log($"Successfully released {step.Color}");
+            }
+            else if (sequence.State.IsColorHeld(color))
+            {
+                isDirty = true;
+                Debug.Log("Released a held color before it was time");
+            }
+
+            sequence.MarkColorAsReleased(color, key);
+        }
+
+        if (step.IsCompleted)
+        {
+            StepCompleted?.Invoke(new KeySequenceStepEventArgs(sequence.CurrentIndex, step));
+        }
+
+        Regenerate(); // Only regens if dirty
+        if (step.IsCompleted)
+        {
+            MoveToNextStep();
+        }
     }
 
     /// <summary>

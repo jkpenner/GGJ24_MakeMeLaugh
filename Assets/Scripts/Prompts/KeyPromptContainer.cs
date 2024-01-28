@@ -13,10 +13,11 @@ public class KeyPromptContainer : MonoBehaviour
     [SerializeField] float despawnPosition = -160f;
 
     private RectTransform rectTransform;
-    private List<KeyPrompt> prompts = new List<KeyPrompt>();
     private List<KeyPrompt> despawned = new List<KeyPrompt>();
+    private Dictionary<int, KeyPrompt> prompts = new Dictionary<int, KeyPrompt>();
 
     public int PromptCount => prompts.Count;
+    public Dictionary<int, KeyPrompt> Prompts => prompts;
     public KeyPrompt CurrentPrompt => prompts.Count > 0 ? prompts[0] : null;
 
     private void Awake()
@@ -24,7 +25,7 @@ public class KeyPromptContainer : MonoBehaviour
         rectTransform = GetComponent<RectTransform>();
     }
 
-    public KeyPrompt SpawnKeyPrompt()
+    public KeyPrompt SpawnKeyPrompt(int stepIndex, KeySequenceStep step)
     {
         var instance = Instantiate(keyPromptPrefab);
         instance.transform.SetParent(keyPromptParent ?? transform);
@@ -32,38 +33,29 @@ public class KeyPromptContainer : MonoBehaviour
         instance.RectTransform.anchorMax = new Vector2(1f, 0f);
         instance.RectTransform.anchoredPosition = new Vector2(0f, rectTransform.rect.height);
         instance.RectTransform.sizeDelta = new Vector2(0f, instance.RectTransform.sizeDelta.y);
-        instance.Keyboard = keyboard;
 
-        prompts.Add(instance);
+        instance.Keyboard = keyboard;
+        instance.Setup(step, stepIndex);
+        prompts.Add(stepIndex, instance);
         return instance;
     }
 
-    public void DespawnKeyPrompt()
+    public void DespawnKeyPrompt(int stepIndex)
     {
-        var toRemove = prompts[0];
-        // Todo: Mark as removed..
-
-        despawned.Add(toRemove);
-        prompts.RemoveAt(0);
+        if (prompts.TryGetValue(stepIndex, out var toRemove))
+        {
+            despawned.Add(toRemove);
+            prompts.Remove(stepIndex);
+        }
     }
 
     private void Update()
     {
-        if (Keyboard.current[Key.Space].wasPressedThisFrame)
-        {
-            if (prompts.Count > 5)
-            {
-                DespawnKeyPrompt();
-            }
-
-            SpawnKeyPrompt();
-        }
-
         float heightOffset = 0f;
 
-        for (int i = 0; i < prompts.Count; i++)
+        foreach (var prompt in prompts.Values)
         {
-            var promptRectTrans = prompts[i].RectTransform;
+            var promptRectTrans = prompt.RectTransform;
 
             var dropAmount = Time.deltaTime * keyPromptDropSpeed;
             var target = Mathf.MoveTowards(promptRectTrans.anchoredPosition.y, heightOffset, dropAmount);

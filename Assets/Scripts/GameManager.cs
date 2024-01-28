@@ -8,7 +8,7 @@ public class GameManager : MonoBehaviour
 {
     [SerializeField] TextAsset wordsAsset;
     [SerializeField] KeySequenceManager sequence;
-    [SerializeField] KeyPromptController prompts;
+    [SerializeField] KeyPromptContainer prompts;
     [SerializeField] KeyboardVisual visual;
     [SerializeField] KeyColorLayoutsScriptableObject keyColorLayouts;
 
@@ -42,11 +42,6 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
-        if (!sequence.IsComplete && prompts.PromptCount < maxActivePrompts)
-        {
-            SpawnPromptFromSequence();
-        }
-
         ProcessKeyEvents();
     }
 
@@ -80,20 +75,8 @@ public class GameManager : MonoBehaviour
         {
             keyVisual.SetPressed(true);
         }
-        
-        var step = sequence.GetCurrentStep();
-        if (step is not null)
-        {
-            if (step.HoldType != HoldType.Release)
-            {
-                sequence.MarkStepCompleted(key, keyVisual != null ? keyVisual.PromptColor : KeyPromptColor.None);
-            }
-            else
-            {
-                // Fail the release step if we press a button.
-                sequence.MarkStepFailed();
-            }
-        }
+
+        sequence.HandlePressEvent(key, keyVisual != null ? keyVisual.PromptColor : KeyPromptColor.None);
     }
 
     private void OnKeyReleaseEvent(Key key)
@@ -103,30 +86,8 @@ public class GameManager : MonoBehaviour
         {
             keyVisual.SetPressed(true);
         }
-        
-        var step = sequence.GetCurrentStep();
-        if (step is not null)
-        {
-            if (step.HoldType == HoldType.Release)
-            {
-                sequence.MarkStepCompleted(key, keyVisual != null ? keyVisual.PromptColor : KeyPromptColor.None);
-            }
-            else
-            {
-                // Releasing a key early does not fail the current press step.
-            }
-        }
-    }
 
-    private void SpawnPromptFromSequence()
-    {
-        var stepIndex = sequence.CurrentIndex + prompts.PromptCount;
-        var step = sequence.GetStep(stepIndex);
-
-        if (step is not null)
-        {
-            prompts.SpawnKeyPrompt().Setup(step, stepIndex);
-        }
+        sequence.HandleReleaseEvent(key, keyVisual != null ? keyVisual.PromptColor : KeyPromptColor.None);
     }
 
     void SetKeyboardColors(Key[] keys, Color color)
