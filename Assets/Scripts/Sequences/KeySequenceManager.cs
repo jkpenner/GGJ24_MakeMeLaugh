@@ -13,8 +13,9 @@ public class KeySequenceManager : MonoBehaviour
 
     public event Action<KeySequenceGroupEventArgs> GroupKeyIndexChanged;
     public event Action<KeySequenceGroupEventArgs> GroupCompleted;
+    public event Action<KeySequenceGroupEventArgs> GroupFailed;
 
-    public event Action<InvalidKeyEventArgs> GroupFailed;
+    public event Action<KeyEventArgs> KeyEventTriggered;
 
     public void SetGameSettings(GameSettings settings)
     {
@@ -55,6 +56,13 @@ public class KeySequenceManager : MonoBehaviour
 
         if (sequence.IsActiveKey(key))
         {
+            KeyEventTriggered?.Invoke(new KeyEventArgs(
+                key,
+                sequence.State.keyIndex,
+                sequence.GetCurrentGroup(),
+                KeyEventType.Success
+            ));
+
             sequence.MoveToNextKey();
 
             // If at the max key limit just move to end of sequence to mark complete
@@ -80,6 +88,13 @@ public class KeySequenceManager : MonoBehaviour
         }
         else
         {
+            KeyEventTriggered?.Invoke(new KeyEventArgs(
+                key,
+                sequence.State.keyIndex,
+                sequence.GetCurrentGroup(),
+                KeyEventType.WrongKeyPressed
+            ));
+
             MarkGroupFailed(key, false);
         }
     }
@@ -90,6 +105,13 @@ public class KeySequenceManager : MonoBehaviour
         {
             return;
         }
+
+        KeyEventTriggered?.Invoke(new KeyEventArgs(
+            key,
+            sequence.State.keyIndex,
+            sequence.GetCurrentGroup(),
+            KeyEventType.KeyReleased
+        ));
 
         MarkGroupFailed(key, true);
     }
@@ -105,7 +127,7 @@ public class KeySequenceManager : MonoBehaviour
         if (group.State == CompletionState.Pending)
         {
             group.MarkFailed();
-            GroupFailed?.Invoke(new InvalidKeyEventArgs(key, wasReleased));
+            GroupFailed?.Invoke(new KeySequenceGroupEventArgs(sequence.GetCurrentGroup(), sequence.KeyIndex));
         }
     }
 

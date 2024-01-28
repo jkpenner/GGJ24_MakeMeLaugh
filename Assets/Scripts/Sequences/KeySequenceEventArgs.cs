@@ -1,3 +1,4 @@
+using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class KeySequenceEventArgs
@@ -19,6 +20,29 @@ public class KeySequenceGroupEventArgs
     {
         KeyIndex = keyIndex;
         Group = group;
+    }
+}
+
+public enum KeyEventType
+{
+    Success,
+    WrongKeyPressed,
+    KeyReleased,
+}
+
+public class KeyEventArgs
+{
+    public readonly Key Key;
+    public readonly int KeyIndex;
+    public readonly KeySequenceGroup Group;
+    public readonly KeyEventType EventType;
+
+    public KeyEventArgs(Key key, int keyIndex, KeySequenceGroup group, KeyEventType eventType)
+    {
+        Key = key;
+        KeyIndex = keyIndex;
+        Group = group;
+        EventType = eventType;
     }
 }
 

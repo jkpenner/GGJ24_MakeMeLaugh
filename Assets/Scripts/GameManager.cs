@@ -1,6 +1,8 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
@@ -31,7 +33,7 @@ public class GameManager : MonoBehaviour
     private GameState state = GameState.Initializing;
     private bool isGameOver = false;
 
-    public void Start()
+    public IEnumerator Start()
     {
         current = Keyboard.current;
         if (current is null)
@@ -49,12 +51,17 @@ public class GameManager : MonoBehaviour
         sequence.GroupKeyIndexChanged += OnGroupKeyIndexChanged;
         sequence.GroupCompleted += OnGroupCompleted;
         sequence.GroupFailed += OnGroupFailed;
+        sequence.KeyEventTriggered += OnKeyEvent;
 
         prompts.PromptsCleared += OnPromptsCleared;
+
+        yield return null;
 
         sequence.StartNextGroup();
         SetGameState(GameState.GroupActive);
     }
+
+    
 
     private void Update()
     {
@@ -126,6 +133,24 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    private void OnKeyEvent(KeyEventArgs args)
+    {
+        if (args.EventType == KeyEventType.Success)
+        {
+            if (prompts.PromptIndexMap.TryGetValue(args.KeyIndex, out var prompt))
+            {
+                prompt.SetAsSuccess();
+            }
+        }
+        else
+        {
+            if (prompts.PromptIndexMap.TryGetValue(args.KeyIndex, out var prompt))
+            {
+                prompt.SetAsFailed();
+            }
+        }
+    }
+
     private void OnGroupKeyIndexChanged(KeySequenceGroupEventArgs args)
     {
         if (!args.Group.IsCompleted)
@@ -141,7 +166,7 @@ public class GameManager : MonoBehaviour
         SetGameState(GameState.GroupDespawning);
     }
 
-    private void OnGroupFailed(InvalidKeyEventArgs args)
+    private void OnGroupFailed(KeySequenceGroupEventArgs args)
     {
         Debug.Log("Failed to completed a group");
         isGameOver = true;
