@@ -4,6 +4,10 @@ using UnityEngine.InputSystem;
 
 public class KeySequenceManager : MonoBehaviour
 {
+    [SerializeField] int maxLettersBetweenHolds = 5;
+    [SerializeField] int maxKeysHeldAtOnce = 3;
+
+    private KeySequenceGenerator generator = null;
     private KeySequence sequence = null;
     private GameSettings settings;
 
