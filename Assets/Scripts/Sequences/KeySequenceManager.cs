@@ -42,17 +42,20 @@ public class KeySequenceManager : MonoBehaviour
         }
     }
 
+    public event Action<KeySequenceEventArgs> SequenceStarted;
     public event Action<KeySequenceEventArgs> SequenceChanged;
     public event Action<KeySequenceEventArgs> SequenceCompleted;
     public event Action<KeySequenceStepEventArgs> StepCompleted;
     public event Action<KeySequenceStepEventArgs> CurrentStepChanged;
 
-    private void Awake()
+    private void Start()
     {
         if (wordSource is not null)
         {
             SetWordSource(wordSource.text);
             Regenerate();
+            
+            SequenceStarted?.Invoke(new KeySequenceEventArgs(sequence));
         }
     }
 

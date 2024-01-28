@@ -15,29 +15,32 @@ public class KeyPromptManager : MonoBehaviour
         {
             sequence.StepCompleted += OnStepCompleted;
             sequence.CurrentStepChanged += OnCurrentStepChanged;
+            sequence.SequenceStarted += OnSequenceStarted;
             sequence.SequenceCompleted += OnSequenceCompleted;
             sequence.SequenceChanged += OnSequenceChanged;
         }
     }
 
-    private void Update()
-    {
-        if (!sequence.IsComplete && container.PromptCount < maxActivePrompts)
-        {
-            SpawnPromptFromSequence();
-        }
-    }
 
-    private void SpawnPromptFromSequence()
-    {
-        var stepIndex = sequence.CurrentIndex + container.PromptCount;
-        var step = sequence.GetStep(stepIndex);
 
-        if (step is not null)
-        {
-            container.SpawnKeyPrompt(stepIndex, step);
-        }
-    }
+    // private void Update()
+    // {
+    //     if (!sequence.IsComplete && container.PromptCount < maxActivePrompts)
+    //     {
+    //         SpawnPromptFromSequence();
+    //     }
+    // }
+
+    // private void SpawnPromptFromSequence()
+    // {
+    //     var stepIndex = sequence.CurrentIndex + container.PromptCount;
+    //     var step = sequence.GetStep(stepIndex);
+
+    //     if (step is not null)
+    //     {
+    //         container.SpawnKeyPrompt(stepIndex, step);
+    //     }
+    // }
 
     private void OnStepCompleted(KeySequenceStepEventArgs args)
     {
@@ -57,9 +60,19 @@ public class KeyPromptManager : MonoBehaviour
         }
     }
 
+    private void OnSequenceStarted(KeySequenceEventArgs args)
+    {
+        int stepIndex = args.Sequence.CurrentIndex;
+        var step = sequence.GetStep(stepIndex);
+        if (step is not null)
+        {
+            container.SpawnKeyPrompt(stepIndex, step);
+        }
+    }
+
     private void OnSequenceCompleted(KeySequenceEventArgs args)
     {
-        foreach(var (stepIndex, _) in container.Prompts)
+        foreach (var (stepIndex, _) in container.Prompts)
         {
             container.DespawnKeyPrompt(stepIndex);
         }
@@ -67,7 +80,7 @@ public class KeyPromptManager : MonoBehaviour
 
     private void OnSequenceChanged(KeySequenceEventArgs args)
     {
-        foreach(var (stepIndex, prompt) in container.Prompts)
+        foreach (var (stepIndex, prompt) in container.Prompts)
         {
             var step = sequence.GetStep(stepIndex);
             if (step is not null)
