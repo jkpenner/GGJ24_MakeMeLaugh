@@ -1,24 +1,37 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 [System.Serializable]
 public class KeySequence
 {
     public List<KeySequenceStep> steps;
+    private KeySequenceState state;
 
-    public int CurrentIndex;
+    public int CurrentIndex => state.index;
     public int StepCount => steps.Count;
     public bool IsComplete => CurrentIndex == StepCount;
+    public KeySequenceState State => state;
 
-    public KeySequence(List<KeySequenceStep> steps)
+    public KeySequence()
     {
-        this.steps = steps;
+        this.state = new KeySequenceState();
+        this.steps = new List<KeySequenceStep>();
+    }
+
+    /// <summary>
+    /// Resets the sequence back to its starting position.
+    /// </summary>
+    public void Reset()
+    {
+        state.Reset();
     }
 
     public void MoveToNextStep()
     {
-        CurrentIndex += 1;
-        CurrentIndex = Mathf.Min(CurrentIndex, StepCount);
+        state.index += 1;
+        state.index = Mathf.Min(CurrentIndex, StepCount);
     }
 
     public KeySequenceStep GetCurrentStep()
@@ -33,5 +46,27 @@ public class KeySequence
             return steps[index];
         }
         return null;
+    }
+
+    public void MarkKeyAsHeld(Key key)
+    {
+        state.heldKeys.Add(key);
+    }
+
+    public void MarkKeyAsReleased(Key key)
+    {
+        state.heldKeys.Remove(key);
+    }
+
+    public void MarkColorAsHeld(KeyPromptColor color, Key key)
+    {
+        state.heldColors.Add(color);
+        state.heldColorKeys[color] = key;
+    }
+
+    public void MarkColorAsReleased(KeyPromptColor color, Key key)
+    {
+        state.heldColors.Remove(color);
+        state.heldColorKeys.Remove(color);
     }
 }

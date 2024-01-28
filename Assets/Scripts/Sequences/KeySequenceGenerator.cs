@@ -1,4 +1,8 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using NUnit.Framework;
+using NUnit.Framework.Internal.Execution;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -8,194 +12,173 @@ public class KeySequenceGenerator
     public int MaxLettersBetweenHolds { get; set; } = 5;
     public float RandomizerSpawnChange { get; set; } = 0.2f;
 
-    string[] words;
-    int wordIndex;
-    int letterIndex;
+    string text;
 
-    HashSet<Key> heldKeys = new HashSet<Key>();
-    KeyPromptColor heldColor = KeyPromptColor.None;
-
-    public KeySequenceGenerator(string[] words)
+    public KeySequenceGenerator(string text)
     {
-        this.words = words;
+        // Normalize string replace all new lines with a space.
+        this.text = text.Replace("\r\n", " ").Replace("\n", " ");
     }
 
-    public KeySequence Generate()
+    /// <summary>
+    /// Generates the given sequence starting at the sequence's current index.
+    /// </summary>
+    public void Generate(ref KeySequence sequence)
     {
-        List<KeySequenceStep> steps = new List<KeySequenceStep>();
+        var state = sequence.State.Clone();
 
-        for (int wordIndex = 0; wordIndex < words.Length; wordIndex++)
+        // Clear all from the current index till the end
+        sequence.steps.RemoveRange(sequence.CurrentIndex, sequence.steps.Count - sequence.CurrentIndex - 1);
+
+        for (int i = sequence.CurrentIndex; i < text.Length; i++)
         {
-            var word = words[wordIndex];
+            state.index = i;
 
-            // Use less than equal to, when letter index is equal then that 
-            // will be considered the end of the word and a color or other
-            // step should be inserted.
-            for (int letterIndex = 0; letterIndex <= word.Length; letterIndex++)
+            char letter = text[i];
+            if (letter != ' ')
             {
-                if (letterIndex < word.Length)
-                {
-                    char letter = word[letterIndex];
-                    if (TryProduceKeyStep(letter, out KeySequenceStep step))
-                    {
-                        steps.Add(step);
-                    }
-                }
-                else
-                {
-                    steps.Add(GenerateRandomFillerStep());
-                }
+                GenerateAndAppendFillerStep(ref sequence, ref state);
+                continue;
             }
-        }
 
-        return new KeySequence(steps);
+            if (!System.Enum.TryParse(letter.ToString(), true, out Key key))
+            {
+                Debug.Log($"Failed to parse key from letter '{letter}'");
+                continue;
+            }
+
+            GenerateAndAppendKeyStep(ref sequence, ref state, key, letter);
+        }
     }
 
-
-
-    private int GetHeldKeyCount()
+    private void GenerateAndAppendKeyStep(ref KeySequence sequence, ref KeySequenceState state, Key key, char letter)
     {
-        return heldKeys.Count + (heldColor != KeyPromptColor.None ? 1 : 0);
-    }
-
-    private bool TryProduceKeyStep(char letter, out KeySequenceStep step)
-    {
-        if (!System.Enum.TryParse(letter.ToString(), true, out Key key))
-        {
-            step = null;
-            return false;
-        }
-
-        step = new KeySequenceStep
+        var step = new KeySequenceStep
         {
             Type = StepType.Key,
             Key = key,
             HoldType = HoldType.None
         };
 
-        if (CheckIfKeyShouldBeReleased(key))
+        if (ShouldKeyBeReleased(ref state, key, letter))
         {
             step.HoldType = HoldType.Release;
-            heldKeys.Remove(key);
-        }
-        else if (CheckIfKeyShouldBeHeld(key))
-        {
-            step.HoldType = HoldType.Hold;
-            heldKeys.Add(key);
-        }
-
-        return true;
-    }
-
-    private bool CheckIfKeyShouldBeReleased(Key key)
-    {
-        if (!heldKeys.Contains(key))
-        {
-            return false;
-        }
-
-        return true;
-    }
-
-    private bool CheckIfKeyShouldBeHeld(Key key)
-    {
-        if (heldKeys.Contains(key))
-        {
-            return false;
-        }
-
-        if (GetHeldKeyCount() >= MaxKeysHeldAtOnce)
-        {
-            return false;
-        }
-
-        if (!IsNextMatchingKeyWithinDistance(key, MaxLettersBetweenHolds))
-        {
-            return false;
-        }
-
-        return true;
-    }
-
-    private bool IsNextEndOfWordWithinDistance(int maxDistance)
-    {
-        return words[wordIndex + 1].Length < maxDistance;
-    }
-
-    private bool IsNextMatchingKeyWithinDistance(Key key, int maxDistance)
-    {
-        int distance = 0;
-        int workingIndex = letterIndex + 1;
-
-        for (int i = wordIndex; i < words.Length; i++)
-        {
-            for (int j = workingIndex; j < words[wordIndex].Length; j++)
+            // If key was not removed it belonged to a color
+            if (!state.heldKeys.Remove(key))
             {
-                distance += 1;
-                if (distance >= maxDistance)
+                foreach (var (color, keyValue) in state.heldColorKeys)
                 {
-                    return false;
-                }
-
-                var letter = words[wordIndex][workingIndex].ToString();
-                if (!System.Enum.TryParse(letter, true, out Key nextKey))
-                {
-                    continue;
-                }
-
-                if (nextKey == key)
-                {
-                    return true;
+                    if (keyValue == key)
+                    {
+                        state.heldColors.Remove(color);
+                        state.heldColorKeys.Remove(color);
+                    }
                 }
             }
-            workingIndex = 0;
+        }
+        else if (ShouldKeyBeHeld(ref state, key, letter))
+        {
+            step.HoldType = HoldType.Hold;
+            state.heldKeys.Add(key);
+        }
+
+        sequence.steps.Add(step);
+    }
+
+    private void GenerateAndAppendFillerStep(ref KeySequence sequence, ref KeySequenceState state)
+    {
+        KeySequenceStep step;
+        if (UnityEngine.Random.Range(0f, 1f) < RandomizerSpawnChange)
+        {
+            step = GenerateRandomizerStep();
+        }
+        else
+        {
+            step = GenerateColorStep(ref state);
+        }
+        sequence.steps.Add(step);
+    }
+
+
+    private bool ShouldKeyBeReleased(ref KeySequenceState state, Key key, char letter)
+    {
+        return state.IsKeyHeld(key);
+    }
+
+    private bool ShouldKeyBeHeld(ref KeySequenceState state, Key key, char letter)
+    {
+        if (state.IsKeyHeld(key))
+        {
+            return false;
+        }
+
+        if (state.HeldKeyCount() >= MaxKeysHeldAtOnce)
+        {
+            return false;
+        }
+
+        if (!DistanceToNext(letter, state.index, MaxLettersBetweenHolds))
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    private bool DistanceToNext(char letter, int startIndex, int maxDistance)
+    {
+        int distance = 0;
+        int workingIndex = startIndex + 1;
+
+        for (int i = workingIndex; i < text.Length; i++)
+        {
+            distance += 1;
+            if (distance >= maxDistance)
+            {
+                return false;
+            }
+
+            if (letter == text[i])
+            {
+                return true;
+            }
         }
 
         return false;
     }
 
-    private KeySequenceStep GenerateRandomFillerStep()
+    private KeySequenceStep GenerateColorStep(ref KeySequenceState state)
     {
-        if (UnityEngine.Random.Range(0f, 1f) < RandomizerSpawnChange)
+        var step = new KeySequenceStep
         {
-            return GenerateRandomizerStep();
+            Type = StepType.Color,
+            HoldType = HoldType.None
+        };
+
+        // Check if no currently held colors
+        if (state.heldColors.Count == 0)
+        {
+            bool isHeld = state.HeldKeyCount() < MaxKeysHeldAtOnce
+                && DistanceToNext(' ', state.index, MaxLettersBetweenHolds);
+
+            step.HoldType = isHeld ? HoldType.Hold : HoldType.None;
+            step.Color = (KeyPromptColor)UnityEngine.Random.Range(1, 5);
+
+            if (isHeld)
+            {
+                state.heldColors.Add(step.Color);
+            }
         }
         else
         {
-            return GenerateColorStep();
-        }
-    }
+            step.Color = state.heldColors.First();
+            step.HoldType = HoldType.Release;
 
-    private KeySequenceStep GenerateColorStep()
-    {
-        if (heldColor != KeyPromptColor.None)
-        {
-            return new KeySequenceStep
-            {
-                Type = StepType.Color,
-                Color = heldColor,
-                HoldType = HoldType.Release,
-            };
+            state.heldColors.Remove(step.Color);
+            state.heldColorKeys.Remove(step.Color);
         }
-        else
-        {
-            bool isHeld = true;
-            if (GetHeldKeyCount() >= MaxKeysHeldAtOnce)
-            {
-                isHeld = false;
-            }
-            else if (!IsNextEndOfWordWithinDistance(MaxLettersBetweenHolds))
-            {
-                isHeld = false;
-            }
 
-            return new KeySequenceStep
-            {
-                Type = StepType.Color,
-                Color = (KeyPromptColor)UnityEngine.Random.Range(1, 5),
-                HoldType = isHeld ? HoldType.Hold : HoldType.None,
-            };
-        }
+        return step;
     }
 
     private KeySequenceStep GenerateRandomizerStep()
