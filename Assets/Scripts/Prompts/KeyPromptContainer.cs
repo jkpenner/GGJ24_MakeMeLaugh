@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class KeyPromptController : MonoBehaviour
+public class KeyPromptContainer : MonoBehaviour
 {
     [SerializeField] KeyboardVisual keyboard;
     [SerializeField] Transform keyPromptParent;
