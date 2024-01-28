@@ -28,14 +28,17 @@ public class KeySequenceGenerator
         var state = sequence.State.Clone();
 
         // Clear all from the current index till the end
-        sequence.steps.RemoveRange(sequence.CurrentIndex, sequence.steps.Count - sequence.CurrentIndex - 1);
+        if (sequence.CurrentIndex < sequence.steps.Count)
+        {
+            sequence.steps.RemoveRange(sequence.CurrentIndex, sequence.steps.Count - sequence.CurrentIndex - 1);
+        }
 
         for (int i = sequence.CurrentIndex; i < text.Length; i++)
         {
             state.index = i;
 
             char letter = text[i];
-            if (letter != ' ')
+            if (letter == ' ')
             {
                 GenerateAndAppendFillerStep(ref sequence, ref state);
                 continue;
