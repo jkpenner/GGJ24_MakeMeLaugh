@@ -128,7 +128,10 @@ public class GameManager : MonoBehaviour
 
     private void OnGroupKeyIndexChanged(KeySequenceGroupEventArgs args)
     {
-        prompts.SpawnKeyPrompt(args.Group, args.KeyIndex);
+        if (!args.Group.IsCompleted)
+        {
+            prompts.SpawnKeyPrompt(args.Group, args.KeyIndex);
+        }
     }
 
     private void OnGroupCompleted(KeySequenceGroupEventArgs args)

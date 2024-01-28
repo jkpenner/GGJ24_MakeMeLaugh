@@ -80,8 +80,7 @@ public class KeySequenceManager : MonoBehaviour
         }
         else
         {
-            Debug.Log("Invalid Key Pressed");
-            GroupFailed?.Invoke(new InvalidKeyEventArgs(key, false));
+            MarkGroupFailed(key, false);
         }
     }
 
@@ -92,7 +91,22 @@ public class KeySequenceManager : MonoBehaviour
             return;
         }
 
-        GroupFailed?.Invoke(new InvalidKeyEventArgs(key, true));
+        MarkGroupFailed(key, true);
+    }
+
+    public void MarkGroupFailed(Key key, bool wasReleased)
+    {
+        if (sequence is null || sequence.IsComplete || sequence.IsCurrentGroupComplete())
+        {
+            return;
+        }
+
+        var group = sequence.GetCurrentGroup();
+        if (group.State == CompletionState.Pending)
+        {
+            group.MarkFailed();
+            GroupFailed?.Invoke(new InvalidKeyEventArgs(key, wasReleased));
+        }
     }
 
     public void StartNextGroup()
