@@ -135,4 +135,28 @@ public class KeyboardVisual : MonoBehaviour
 
         return visuals.TryGetValue(key, out visual);
     }
+
+    public void PopulateKeyPromptColors()
+    {
+        int value = 0;
+
+        // Loop through all rows of the keyboard.
+        for (int i = 0; i < transform.childCount; i++)
+        {
+            // Loop through all keys in the row.
+            var row = transform.GetChild(i);
+            for (int j = 0; j < row.childCount; j++)
+            {
+                var key = row.GetChild(j);
+                if (!key.TryGetComponent(out KeyVisual visual))
+                {
+                    continue;
+                }
+
+
+                visual.SetPromptColor((KeyPromptColor)(value % 4 + 1));
+                value += 1;
+            }
+        }
+    }
 }

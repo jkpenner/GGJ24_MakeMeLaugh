@@ -34,10 +34,12 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        SetKeyboardColors(keyColorLayouts.redKeys, Color.red);
-        SetKeyboardColors(keyColorLayouts.greenKeys, Color.green);
-        SetKeyboardColors(keyColorLayouts.blueKeys, Color.blue);
-        SetKeyboardColors(keyColorLayouts.yellowKeys, Color.yellow);
+        visual.PopulateKeyPromptColors();
+
+        // SetKeyboardColors(keyColorLayouts.redKeys, Color.red);
+        // SetKeyboardColors(keyColorLayouts.greenKeys, Color.green);
+        // SetKeyboardColors(keyColorLayouts.blueKeys, Color.blue);
+        // SetKeyboardColors(keyColorLayouts.yellowKeys, Color.yellow);
     }
 
     private void Update()
