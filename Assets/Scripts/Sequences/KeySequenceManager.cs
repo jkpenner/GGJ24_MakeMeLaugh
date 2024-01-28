@@ -72,12 +72,12 @@ public class KeySequenceManager : MonoBehaviour
 
     public KeySequenceStep GetCurrentStep()
     {
-        return sequence.GetCurrentStep();
+        return sequence?.GetCurrentStep() ?? null;
     }
 
     public KeySequenceStep GetStep(int index)
     {
-        return sequence.GetStep(index);
+        return sequence?.GetStep(index) ?? null;
     }
 
     public void Regenerate()
@@ -88,6 +88,11 @@ public class KeySequenceManager : MonoBehaviour
         }
 
         isDirty = false;
+
+        if (sequence is null)
+        {
+            sequence = new KeySequence();
+        }
 
         // Update generator values prior to update
         generator.MaxLettersBetweenHolds = maxLettersBetweenHolds;
