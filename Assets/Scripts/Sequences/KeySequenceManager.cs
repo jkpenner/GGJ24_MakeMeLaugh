@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -41,13 +42,10 @@ public class KeySequenceManager : MonoBehaviour
         }
     }
 
-    public delegate void SequenceEvent(KeySequence sequence);
-    public event SequenceEvent SequenceChanged;
-    public event SequenceEvent SequenceCompleted;
-
-    public delegate void SequenceStepEvent(int stepIndex, KeySequenceStep step);
-    public event SequenceStepEvent StepCompleted;
-    public event SequenceStepEvent CurrentStepChanged;
+    public event Action<KeySequenceEventArgs> SequenceChanged;
+    public event Action<KeySequenceEventArgs> SequenceCompleted;
+    public event Action<KeySequenceStepEventArgs> StepCompleted;
+    public event Action<KeySequenceStepEventArgs> CurrentStepChanged;
 
     private void Awake()
     {
@@ -220,7 +218,7 @@ public class KeySequenceManager : MonoBehaviour
             step.MarkSucceeded();
         }
 
-        StepCompleted?.Invoke(sequence.CurrentIndex, step);
+        StepCompleted?.Invoke(new KeySequenceStepEventArgs(sequence.CurrentIndex, step));
 
         Regenerate(); // Only regens if dirty
         MoveToNextStep();
@@ -243,7 +241,7 @@ public class KeySequenceManager : MonoBehaviour
         }
 
         step.MarkFailed();
-        StepCompleted?.Invoke(sequence.CurrentIndex, step);
+        StepCompleted?.Invoke(new KeySequenceStepEventArgs(sequence.CurrentIndex, step));
 
         if (step.HoldType == HoldType.Hold)
         {
@@ -264,11 +262,11 @@ public class KeySequenceManager : MonoBehaviour
         sequence.MoveToNextStep();
         if (sequence.IsComplete)
         {
-            SequenceCompleted?.Invoke(sequence);
+            SequenceCompleted?.Invoke(new KeySequenceEventArgs(sequence));
             return;
         }
 
         var step = sequence.GetCurrentStep();
-        CurrentStepChanged?.Invoke(sequence.CurrentIndex, step);
+        CurrentStepChanged?.Invoke(new KeySequenceStepEventArgs(sequence.CurrentIndex, step));
     }
 }
