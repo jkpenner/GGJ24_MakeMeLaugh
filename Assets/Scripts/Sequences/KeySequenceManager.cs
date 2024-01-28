@@ -4,7 +4,9 @@ using UnityEngine.InputSystem;
 
 public class KeySequenceManager : MonoBehaviour
 {
-    [SerializeField] TextAsset wordSource;
+    [SerializeField] TextAsset wordSourceEasy;
+    [SerializeField] TextAsset wordSourceMedium;
+    [SerializeField] TextAsset wordSourceHard;
     [SerializeField] int maxLettersBetweenHolds = 5;
     [SerializeField] int maxKeysHeldAtOnce = 3;
 
@@ -50,8 +52,26 @@ public class KeySequenceManager : MonoBehaviour
 
     private void Start()
     {
+        TextAsset wordSource = null;
+        int difficulty = PlayerPrefs.GetInt("Difficulty", 0);
+        switch (difficulty) {
+            case 0:
+                wordSource = wordSourceEasy;
+                break;
+            case 1:
+                wordSource = wordSourceMedium;
+                break;
+            case 2:
+                wordSource = wordSourceHard;
+                break;
+            default:
+                wordSource = wordSourceEasy;
+                break;
+        }
+        
         if (wordSource is not null)
         {
+            
             SetWordSource(wordSource.text);
             Regenerate();
             
@@ -66,6 +86,8 @@ public class KeySequenceManager : MonoBehaviour
             Debug.LogWarning($"KeySequence word source can not be set to an empty string.");
             return;
         }
+        
+        
 
         // Normalize string replace all new lines with a space.
         isDirty = true;

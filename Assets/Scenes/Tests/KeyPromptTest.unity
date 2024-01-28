@@ -409,7 +409,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e2cb0a3d4f8925419c2f967d80539a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  wordSource: {fileID: 4900000, guid: 75ebcec5158f0fe4cab2853848718bca, type: 3}
+  wordSource: {fileID: 4900000, guid: 13806520c08eb1e40b85ebee3d9f319e, type: 3}
   maxLettersBetweenHolds: 10
   maxKeysHeldAtOnce: 3
 --- !u!1 &1956072111
