@@ -93,7 +93,7 @@ public class GameManager : MonoBehaviour
         // Temp reload sceen after all keys are releasse when in a game over state
         if ((state == GameState.GameOver || state == GameState.GameVictory) && heldKeys.Count == 0)
         {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            SceneManager.LoadScene(0);
         }
 
         ProcessKeyEvents();
