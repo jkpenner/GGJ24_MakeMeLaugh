@@ -47,7 +47,6 @@ public class GameManager : MonoBehaviour
             keys[i - 1] = (Key)i;
         }
 
-        sequence.SetGameSettings(settings);
         sequence.GroupKeyIndexChanged += OnGroupKeyIndexChanged;
         sequence.GroupCompleted += OnGroupCompleted;
         sequence.GroupFailed += OnGroupFailed;
@@ -55,13 +54,25 @@ public class GameManager : MonoBehaviour
 
         prompts.PromptsCleared += OnPromptsCleared;
 
+        if (settings is null)
+        {
+            yield break;
+        }
+
         yield return null;
 
+        sequence.SetGameSettings(settings);
         sequence.StartNextGroup();
         SetGameState(GameState.GroupActive);
     }
 
-
+    public void StartGameWithSettings(GameSettings settings)
+    {
+        this.settings = settings;
+        sequence.SetGameSettings(settings);
+        sequence.StartNextGroup();
+        SetGameState(GameState.GroupActive);
+    }
 
     private void Update()
     {

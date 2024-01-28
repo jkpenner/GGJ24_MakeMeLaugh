@@ -947,6 +947,9 @@ MonoBehaviour:
   easyButton: {fileID: 2102701443}
   mediumButton: {fileID: 1743133329}
   hardButton: {fileID: 308446284}
+  easySettings: {fileID: 11400000, guid: b8df7d497d9511e4f8c268b9efcd4bc0, type: 2}
+  mediumSettings: {fileID: 11400000, guid: 0205dc1eafbb9c94fb65d15f0074ced9, type: 2}
+  hardSettings: {fileID: 11400000, guid: eee911cbdf38bb243804f9ebc29f71da, type: 2}
 --- !u!4 &1322101024
 Transform:
   m_ObjectHideFlags: 0
