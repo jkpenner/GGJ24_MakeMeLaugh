@@ -61,7 +61,7 @@ public class GameManager : MonoBehaviour
         SetGameState(GameState.GroupActive);
     }
 
-    
+
 
     private void Update()
     {
@@ -87,6 +87,8 @@ public class GameManager : MonoBehaviour
 
         ProcessKeyEvents();
     }
+
+
 
     private void ProcessKeyEvents()
     {
@@ -122,7 +124,7 @@ public class GameManager : MonoBehaviour
         switch (this.state)
         {
             case GameState.GroupDespawning:
-                OnGroupDespawningEntered();
+                StartCoroutine(DespawnPromptsRoutine());
                 break;
             case GameState.GameOver:
                 OnGameOverEntered();
@@ -130,6 +132,23 @@ public class GameManager : MonoBehaviour
             case GameState.GameVictory:
                 OnGameVictoryEntered();
                 break;
+        }
+    }
+
+    private IEnumerator DespawnPromptsRoutine()
+    {
+        // Wait for all prompts to stop moving before despawning them. This will
+        // allow the player to see what keys were missed for a breif period.
+        yield return new WaitUntil(() => !prompts.HasAnyMovingPrompts());
+        yield return new WaitForSeconds(0.5f);
+
+        if (prompts.AnyActivePrompts())
+        {
+            prompts.DespawnAll();
+        }
+        else
+        {
+            OnPromptsCleared();
         }
     }
 
@@ -171,18 +190,6 @@ public class GameManager : MonoBehaviour
         Debug.Log("Failed to completed a group");
         isGameOver = true;
         SetGameState(GameState.GroupDespawning);
-    }
-
-    private void OnGroupDespawningEntered()
-    {
-        if (prompts.AnyActivePrompts())
-        {
-            prompts.DespawnAll();
-        }
-        else
-        {
-            OnPromptsCleared();
-        }
     }
 
     private void OnPromptsCleared()

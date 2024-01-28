@@ -98,4 +98,21 @@ public class KeyPromptContainer : MonoBehaviour
     {
         return despawned.Count > 0 || Prompts.Count > 0;
     }
+
+    public bool HasAnyMovingPrompts()
+    {
+        float heightOffset = 0f;
+        foreach (var prompt in Prompts)
+        {
+            var promptRectTrans = prompt.RectTransform;
+            if (Mathf.Abs(promptRectTrans.anchoredPosition.y - heightOffset) > Mathf.Epsilon)
+            {
+                return true;
+            }
+
+            heightOffset += promptRectTrans.rect.height + 6f;
+        }
+
+        return false;
+    }
 }

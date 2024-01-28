@@ -444,6 +444,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 3613875489751424974}
     m_Modifications:
     - target: {fileID: 184025421803601866, guid: 277ceceebb33d0b40bdc6d56fcaf5fa5, type: 3}
+      propertyPath: m_fontStyle
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 184025421803601866, guid: 277ceceebb33d0b40bdc6d56fcaf5fa5, type: 3}
       propertyPath: m_VerticalAlignment
       value: 4096
       objectReference: {fileID: 0}
