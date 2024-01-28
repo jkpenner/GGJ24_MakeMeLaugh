@@ -586,7 +586,7 @@ PrefabInstance:
       objectReference: {fileID: 7609738967724446132}
     - target: {fileID: 211828829723269511, guid: 795c6f30ef67b8648a8d45bf366281d4, type: 3}
       propertyPath: despawnSpeed
-      value: 1000
+      value: 400
       objectReference: {fileID: 0}
     - target: {fileID: 211828829723269511, guid: 795c6f30ef67b8648a8d45bf366281d4, type: 3}
       propertyPath: keyPromptDropSpeed
