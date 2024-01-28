@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -14,18 +15,21 @@ public class KeyPromptContainer : MonoBehaviour
 
     private RectTransform rectTransform;
     private List<KeyPrompt> despawned = new List<KeyPrompt>();
-    private Dictionary<int, KeyPrompt> prompts = new Dictionary<int, KeyPrompt>();
 
-    public int PromptCount => prompts.Count;
-    public Dictionary<int, KeyPrompt> Prompts => prompts;
-    public KeyPrompt CurrentPrompt => prompts.Count > 0 ? prompts[0] : null;
+    public Dictionary<int, KeyPrompt> PromptIndexMap { get; private set; }
+    public List<KeyPrompt> Prompts { get; private set; }
+
+    public event Action PromptsCleared;
 
     private void Awake()
     {
         rectTransform = GetComponent<RectTransform>();
+        
+        PromptIndexMap = new Dictionary<int, KeyPrompt>();
+        Prompts = new List<KeyPrompt>();
     }
 
-    public KeyPrompt SpawnKeyPrompt(int stepIndex, KeySequenceStep step)
+    public void SpawnKeyPrompt(KeySequenceGroup group, int keyIndex)
     {
         var instance = Instantiate(keyPromptPrefab);
         instance.transform.SetParent(keyPromptParent ?? transform);
@@ -35,17 +39,22 @@ public class KeyPromptContainer : MonoBehaviour
         instance.RectTransform.sizeDelta = new Vector2(0f, instance.RectTransform.sizeDelta.y);
 
         instance.Keyboard = keyboard;
-        instance.Setup(step, stepIndex);
-        prompts.Add(stepIndex, instance);
-        return instance;
+        instance.Setup(group, keyIndex);
+
+        Prompts.Add(instance);
+        PromptIndexMap.Add(keyIndex, instance);
     }
 
-    public void DespawnKeyPrompt(int stepIndex)
+    public void DespawnAll()
     {
-        if (prompts.TryGetValue(stepIndex, out var toRemove))
+        for (int i = Prompts.Count - 1; i >= 0; i--)
         {
-            despawned.Add(toRemove);
-            prompts.Remove(stepIndex);
+            var prompt = Prompts[i];
+            
+            despawned.Add(prompt);
+            
+            Prompts.RemoveAt(i);
+            PromptIndexMap.Remove(prompt.KeyIndex);
         }
     }
 
@@ -53,7 +62,7 @@ public class KeyPromptContainer : MonoBehaviour
     {
         float heightOffset = 0f;
 
-        foreach (var prompt in prompts.Values)
+        foreach (var prompt in Prompts)
         {
             var promptRectTrans = prompt.RectTransform;
 
@@ -76,7 +85,17 @@ public class KeyPromptContainer : MonoBehaviour
             {
                 Destroy(despawned[i].gameObject);
                 despawned.RemoveAt(i);
+
+                if (!AnyActivePrompts())
+                {
+                    PromptsCleared?.Invoke();
+                }
             }
         }
+    }
+
+    public bool AnyActivePrompts()
+    {
+        return despawned.Count > 0 || Prompts.Count > 0;
     }
 }

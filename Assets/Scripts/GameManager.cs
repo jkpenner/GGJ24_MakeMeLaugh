@@ -1,23 +1,37 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
+
+public enum GameState
+{
+    Initializing,
+    GroupStarting,
+    GroupActive,
+    GroupDespawning,
+    GroupComplete,
+    GameOver,
+    GameVictory
+}
 
 public class GameManager : MonoBehaviour
 {
-    [SerializeField] TextAsset wordsAsset;
+    [SerializeField] GameSettings settings;
     [SerializeField] KeySequenceManager sequence;
     [SerializeField] KeyPromptContainer prompts;
     [SerializeField] KeyboardVisual visual;
-    [SerializeField] KeyColorLayoutsScriptableObject keyColorLayouts;
 
     Keyboard current;
     Key[] keys;
+    HashSet<Key> heldKeys = new HashSet<Key>();
 
-    [SerializeField] int maxActivePrompts = 1;
 
-    private void Awake()
+    private GameState state = GameState.Initializing;
+    private bool isGameOver = false;
+
+    public void Start()
     {
         current = Keyboard.current;
         if (current is null)
@@ -30,20 +44,40 @@ public class GameManager : MonoBehaviour
         {
             keys[i - 1] = (Key)i;
         }
-    }
 
-    private void Start()
-    {
-        visual.PopulateKeyPromptColors();
+        sequence.SetGameSettings(settings);
+        sequence.GroupKeyIndexChanged += OnGroupKeyIndexChanged;
+        sequence.GroupCompleted += OnGroupCompleted;
+        sequence.GroupFailed += OnGroupFailed;
 
-        // SetKeyboardColors(keyColorLayouts.redKeys, Color.red);
-        // SetKeyboardColors(keyColorLayouts.greenKeys, Color.green);
-        // SetKeyboardColors(keyColorLayouts.blueKeys, Color.blue);
-        // SetKeyboardColors(keyColorLayouts.yellowKeys, Color.yellow);
+        prompts.PromptsCleared += OnPromptsCleared;
+
+        sequence.StartNextGroup();
+        SetGameState(GameState.GroupActive);
     }
 
     private void Update()
     {
+        if (state == GameState.GroupComplete && heldKeys.Count == 0)
+        {
+            sequence.StartNextGroup();
+
+            if (sequence.IsComplete)
+            {
+                SetGameState(GameState.GameVictory);
+            }
+            else
+            {
+                SetGameState(GameState.GroupActive);
+            }
+        }
+
+        // Temp reload sceen after all keys are releasse when in a game over state
+        if ((state == GameState.GameOver || state == GameState.GameVictory) && heldKeys.Count == 0)
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
+
         ProcessKeyEvents();
     }
 
@@ -70,33 +104,92 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void OnKeyPressEvent(Key key)
+    private void SetGameState(GameState state)
     {
-        var keyVisual = visual.GetKeyVisual(key);
-        if (keyVisual != null)
+        if (this.state == state)
         {
-            keyVisual.SetPressed(true);
+            return;
         }
 
-        sequence.HandlePressEvent(key, keyVisual != null ? keyVisual.PromptColor : KeyPromptColor.None);
+        this.state = state;
+        switch (this.state)
+        {
+            case GameState.GroupDespawning:
+                OnGroupDespawningEntered();
+                break;
+            case GameState.GameOver:
+                OnGameOverEntered();
+                break;
+            case GameState.GameVictory:
+                OnGameVictoryEntered();
+                break;
+        }
+    }
+
+    private void OnGroupKeyIndexChanged(KeySequenceGroupEventArgs args)
+    {
+        prompts.SpawnKeyPrompt(args.Group, args.KeyIndex);
+    }
+
+    private void OnGroupCompleted(KeySequenceGroupEventArgs args)
+    {
+        // Group was successfully completed
+        Debug.Log("Successfully completed a group");
+        SetGameState(GameState.GroupDespawning);
+    }
+
+    private void OnGroupFailed(InvalidKeyEventArgs args)
+    {
+        Debug.Log("Failed to completed a group");
+        isGameOver = true;
+        SetGameState(GameState.GroupDespawning);
+    }
+
+    private void OnGroupDespawningEntered()
+    {
+        if (prompts.AnyActivePrompts())
+        {
+            prompts.DespawnAll();
+        }
+        else
+        {
+            OnPromptsCleared();
+        }
+    }
+
+    private void OnPromptsCleared()
+    {
+        if (isGameOver)
+        {
+            SetGameState(GameState.GameOver);
+        }
+        else
+        {
+            SetGameState(GameState.GroupComplete);
+        }
+    }
+
+    private void OnGameVictoryEntered()
+    {
+        Debug.Log("Game Won!");
+    }
+
+    private void OnGameOverEntered()
+    {
+        Debug.Log("Game Over");
+    }
+
+    private void OnKeyPressEvent(Key key)
+    {
+        visual.SetKeyPressed(key, true);
+        sequence.HandlePressEvent(key);
+        heldKeys.Add(key);
     }
 
     private void OnKeyReleaseEvent(Key key)
     {
-        var keyVisual = visual.GetKeyVisual(key);
-        if (keyVisual != null)
-        {
-            keyVisual.SetPressed(true);
-        }
-
-        sequence.HandleReleaseEvent(key, keyVisual != null ? keyVisual.PromptColor : KeyPromptColor.None);
-    }
-
-    void SetKeyboardColors(Key[] keys, Color color)
-    {
-        foreach (var key in keys)
-        {
-            visual.GetKeyVisual(key).SetColor(color);
-        }
+        visual.SetKeyPressed(key, false);
+        sequence.HandleReleaseEvent(key);
+        heldKeys.Remove(key);
     }
 }

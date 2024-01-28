@@ -251,8 +251,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d84b55765f71934587b4d1556368951, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  container: {fileID: 375028136}
-  maxActivePrompts: 1
 --- !u!1 &1392742144
 GameObject:
   m_ObjectHideFlags: 0
@@ -376,12 +374,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8bf270e1c603d3944bfe51f31abdb5a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  wordsAsset: {fileID: 4900000, guid: 75ebcec5158f0fe4cab2853848718bca, type: 3}
+  settings: {fileID: 11400000, guid: de2997e02a75d2a49881b236c9a074ed, type: 2}
   sequence: {fileID: 1657106607}
   prompts: {fileID: 375028136}
   visual: {fileID: 7609738967724446132}
-  keyColorLayouts: {fileID: 11400000, guid: c0d6e8933a6bd5549bb861ff3cf8d2da, type: 2}
-  maxActivePrompts: 1
 --- !u!4 &1657106606
 Transform:
   m_ObjectHideFlags: 0
@@ -409,9 +405,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e2cb0a3d4f8925419c2f967d80539a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  wordSource: {fileID: 4900000, guid: 75ebcec5158f0fe4cab2853848718bca, type: 3}
-  maxLettersBetweenHolds: 10
-  maxKeysHeldAtOnce: 3
 --- !u!1 &1956072111
 GameObject:
   m_ObjectHideFlags: 0

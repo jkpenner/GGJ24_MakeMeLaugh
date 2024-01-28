@@ -1,0 +1,5 @@
+h,e,l,digit9
+q,t,space,l
+leftshift,rightshift,t,backslash
+g,k,z,leftctrl,
+digit1,digit4,d,x,y,rightshift

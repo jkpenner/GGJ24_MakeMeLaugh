@@ -6,67 +6,88 @@ using UnityEngine.InputSystem;
 [System.Serializable]
 public class KeySequence
 {
-    public List<KeySequenceStep> steps;
+    private List<KeySequenceGroup> groups;
     private KeySequenceState state;
 
-    public int CurrentIndex => state.index;
-    public int StepCount => steps.Count;
-    public bool IsComplete => CurrentIndex == StepCount;
+    public List<KeySequenceGroup> Groups => groups;
     public KeySequenceState State => state;
+
+    public int GroupIndex => state.groupIndex;
+    public int KeyIndex => state.keyIndex;    
+
+    public int SequenceGroupCount => groups.Count;
+    public bool IsComplete => GroupIndex == SequenceGroupCount;
 
     public KeySequence()
     {
         this.state = new KeySequenceState();
-        this.steps = new List<KeySequenceStep>();
+        this.groups = new List<KeySequenceGroup>();
     }
 
-    /// <summary>
-    /// Resets the sequence back to its starting position.
-    /// </summary>
+    public bool IsActiveKey(Key key)
+    {
+        if (IsComplete)
+        {
+            return false;
+        }
+
+        if (GroupIndex < 0 || GroupIndex >= groups.Count)
+        {
+            return false;
+        }
+
+        var group = groups[GroupIndex];
+        if (KeyIndex < 0 || KeyIndex >= group.Keys.Count)
+        {
+            return false;
+        }
+
+        return group.Keys[KeyIndex] == key;
+    }
+
     public void Reset()
     {
         state.Reset();
     }
 
-    public void MoveToNextStep()
+    public void MoveToNextKey()
     {
-        state.index += 1;
-        state.index = Mathf.Min(CurrentIndex, StepCount);
-    }
-
-    public KeySequenceStep GetCurrentStep()
-    {
-        return GetStep(CurrentIndex);
-    }
-
-    public KeySequenceStep GetStep(int index)
-    {
-        if (index >= 0 && index < StepCount)
+        if (IsComplete || GroupIndex >= groups.Count)
         {
-            return steps[index];
+            return;
         }
-        return null;
+
+        state.keyIndex = Mathf.Min(state.keyIndex + 1, groups[GroupIndex].Keys.Count);
     }
 
-    public void MarkKeyAsHeld(Key key)
+    public void MoveToNextGroup()
     {
-        state.heldKeys.Add(key);
+        if (IsComplete)
+        {
+            return;
+        }
+
+        state.groupIndex = Mathf.Min(state.groupIndex + 1, SequenceGroupCount);
+        state.keyIndex = 0;
     }
 
-    public void MarkKeyAsReleased(Key key)
+    public bool IsCurrentGroupComplete()
     {
-        state.heldKeys.Remove(key);
+        if (IsComplete || GroupIndex < 0 || GroupIndex >= groups.Count)
+        {
+            return false;
+        }
+
+        return groups[GroupIndex].Keys.Count <= state.keyIndex;
     }
 
-    public void MarkColorAsHeld(KeyPromptColor color, Key key)
+    public KeySequenceGroup GetCurrentGroup()
     {
-        state.heldColors.Add(color);
-        state.heldColorKeys[color] = key;
-    }
+        if (IsComplete || GroupIndex < 0 || GroupIndex >= groups.Count)
+        {
+            return null;
+        }
 
-    public void MarkColorAsReleased(KeyPromptColor color, Key key)
-    {
-        state.heldColors.Remove(color);
-        state.heldColorKeys.Remove(color);
+        return groups[GroupIndex];
     }
 }

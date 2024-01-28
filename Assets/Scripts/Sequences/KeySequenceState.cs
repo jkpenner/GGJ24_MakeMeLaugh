@@ -3,25 +3,20 @@ using UnityEngine.InputSystem;
 
 public class KeySequenceState
 {
-    public int index;
+    public int groupIndex;
+    public int keyIndex;
     public HashSet<Key> heldKeys;
-    public HashSet<KeyPromptColor> heldColors;
-    public Dictionary<KeyPromptColor, Key> heldColorKeys;
 
     public KeySequenceState()
     {
-        index = 0;
+        groupIndex = -1;
         heldKeys = new HashSet<Key>();
-        heldColors = new HashSet<KeyPromptColor>();
-        heldColorKeys = new Dictionary<KeyPromptColor, Key>();
     }
 
     public KeySequenceState(KeySequenceState other)
     {
-        index = other.index;
+        groupIndex = other.groupIndex;
         heldKeys = new HashSet<Key>(other.heldKeys);
-        heldColors = new HashSet<KeyPromptColor>(other.heldColors);
-        heldColorKeys = new Dictionary<KeyPromptColor, Key>(other.heldColorKeys);
     }
 
     public KeySequenceState Clone()
@@ -31,10 +26,8 @@ public class KeySequenceState
 
     public void Reset()
     {
-        index = 0;
+        groupIndex = -1;
         heldKeys.Clear();
-        heldColors.Clear();
-        heldColorKeys.Clear();
     }
 
     /// <summary>
@@ -42,7 +35,7 @@ public class KeySequenceState
     /// </summary>
     public int HeldKeyCount()
     {
-        return heldKeys.Count + heldColors.Count;
+        return heldKeys.Count;
     }
 
     /// <summary>
@@ -50,14 +43,6 @@ public class KeySequenceState
     /// </summary>
     public bool IsKeyHeld(Key key)
     {
-        return heldKeys.Contains(key) || heldColorKeys.ContainsValue(key);
-    }
-
-    /// <summary>
-    /// Checks if the target color is currently held own.
-    /// </summary>
-    public bool IsColorHeld(KeyPromptColor color)
-    {
-        return heldColors.Contains(color);
+        return heldKeys.Contains(key);
     }
 }

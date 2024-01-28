@@ -1,3 +1,5 @@
+using UnityEngine.InputSystem;
+
 public class KeySequenceEventArgs
 {
     public readonly KeySequence Sequence;
@@ -8,14 +10,26 @@ public class KeySequenceEventArgs
     }
 }
 
-public class KeySequenceStepEventArgs
+public class KeySequenceGroupEventArgs
 {
-    public readonly int StepIndex;
-    public readonly KeySequenceStep Step;
+    public readonly int KeyIndex;
+    public readonly KeySequenceGroup Group;
 
-    public KeySequenceStepEventArgs(int index, KeySequenceStep step)
+    public KeySequenceGroupEventArgs(KeySequenceGroup group, int keyIndex)
     {
-        StepIndex = index;
-        Step = step;
+        KeyIndex = keyIndex;
+        Group = group;
+    }
+}
+
+public class InvalidKeyEventArgs
+{
+    public readonly Key Key;
+    public bool WasReleased;
+
+    public InvalidKeyEventArgs(Key key, bool wasReleased)
+    {
+        Key = key;
+        WasReleased = wasReleased;
     }
 }
