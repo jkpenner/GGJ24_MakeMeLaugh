@@ -106,12 +106,19 @@ public class KeySequenceManager : MonoBehaviour
             return;
         }
 
-        KeyEventTriggered?.Invoke(new KeyEventArgs(
-            key,
-            sequence.State.keyIndex,
-            sequence.GetCurrentGroup(),
-            KeyEventType.KeyReleased
-        ));
+        var group = sequence.GetCurrentGroup();
+        for (int i = 0; i < group.Keys.Count; i++)
+        {
+            if (group.Keys[i] == key)
+            {
+                KeyEventTriggered?.Invoke(new KeyEventArgs(
+                    key,
+                    i,
+                    group,
+                    KeyEventType.KeyReleased
+                ));
+            }
+        }
 
         MarkGroupFailed(key, true);
     }
