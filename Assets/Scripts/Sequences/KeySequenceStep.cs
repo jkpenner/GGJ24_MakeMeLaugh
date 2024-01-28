@@ -15,6 +15,13 @@ public enum HoldType
     Release,
 }
 
+public enum CompletionState
+{
+    Pending,
+    Succeeded,
+    Failed,
+}
+
 [System.Serializable]
 public class KeySequenceStep
 {
@@ -27,4 +34,22 @@ public class KeySequenceStep
     public Key Key { get => key; set => key = value; }
     public KeyPromptColor Color { get => color; set => color = value; }
     public HoldType HoldType { get => holdType; set => holdType = value; }
+
+    public CompletionState State { get; private set; }
+    public bool IsCompleted => State != CompletionState.Pending;
+
+    public void MarkSucceeded()
+    {
+        State = CompletionState.Succeeded;
+    }
+
+    public void MarkFailed()
+    {
+        State = CompletionState.Failed;
+    }
+
+    public void Reset()
+    {
+        State = CompletionState.Pending;
+    }
 }
