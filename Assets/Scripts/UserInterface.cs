@@ -10,9 +10,11 @@ public class UserInterface : MonoBehaviour
     [SerializeField] TMP_Text multiplierLabel;
     [SerializeField] TMP_Text timerLabel;
     [SerializeField] TMP_Text lifesLabel;
+    [SerializeField] GameNotification notification;
 
     public KeyboardVisual Keyboard => keyboard;
     public KeyPromptContainer Prompts => prompts;
+    public GameNotification Notification => notification;
 
     public void SetScore(int score)
     {

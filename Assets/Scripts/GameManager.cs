@@ -182,6 +182,24 @@ public class GameManager : MonoBehaviour
 
     private void OnKeyEvent(KeyEventArgs args)
     {
+        if (args.EventType == KeyEventType.WrongKeyPressed)
+        {
+            ui.Notification.ShowMessage(
+                "Streak Broken",
+                "Hit the wrong key",
+                GameConsts.Red
+            );
+        }
+        else if (args.EventType == KeyEventType.KeyReleased)
+        {
+            ui.Notification.ShowMessage(
+                "Streak Broken",
+                "Release a key too early",
+                GameConsts.Red
+            );
+        }
+
+
         if (args.EventType == KeyEventType.Success)
         {
             AddKeyPressScore();
@@ -224,6 +242,12 @@ public class GameManager : MonoBehaviour
 
     private void OnGroupCompleted(KeySequenceGroupEventArgs args)
     {
+         ui.Notification.ShowMessage(
+            "Sequence Complete",
+            "Release keys to start next sequence",
+            GameConsts.Green
+        );
+
         AddGroupCompleteScore();
 
         // Group was successfully completed
