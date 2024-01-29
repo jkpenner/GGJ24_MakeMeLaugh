@@ -140,7 +140,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.17181383, g: 0.28115773, b: 0.31132078, a: 1}
+  m_Color: {r: 0.16470589, g: 0.16470589, b: 0.20392157, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -170,10 +170,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Padding:
-    m_Left: 10
-    m_Right: 10
-    m_Top: 10
-    m_Bottom: 10
+    m_Left: 50
+    m_Right: 50
+    m_Top: 14
+    m_Bottom: 14
   m_ChildAlignment: 0
   m_Spacing: 2
   m_ChildForceExpandWidth: 1
@@ -209,7 +209,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b1627be5801a72948a68a39c40254430, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  debugInputs: 1
 --- !u!1 &3067712417811807305
 GameObject:
   m_ObjectHideFlags: 0
@@ -6391,7 +6390,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1586559915926433779, guid: 277ceceebb33d0b40bdc6d56fcaf5fa5, type: 3}
       propertyPath: m_Name
-      value: Key_Backquotes
+      value: Key_Backquote
       objectReference: {fileID: 0}
     - target: {fileID: 4385255087594186490, guid: 277ceceebb33d0b40bdc6d56fcaf5fa5, type: 3}
       propertyPath: m_PreferredWidth
@@ -7031,7 +7030,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1586559915926433779, guid: 277ceceebb33d0b40bdc6d56fcaf5fa5, type: 3}
       propertyPath: m_Name
-      value: Key_RightMeta
+      value: Key_
       objectReference: {fileID: 0}
     - target: {fileID: 4385255087594186490, guid: 277ceceebb33d0b40bdc6d56fcaf5fa5, type: 3}
       propertyPath: m_PreferredWidth
