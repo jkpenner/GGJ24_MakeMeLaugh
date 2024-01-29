@@ -10,9 +10,20 @@ public class KeyboardVisual : MonoBehaviour
     Keyboard current;
     Key[] keys;
 
+    private GameSettings settings;
+
     private void Awake()
     {
         ExtractKeyVisuals();
+    }
+
+    public void SetGameSettings(GameSettings settings)
+    {
+        this.settings = settings;
+        foreach(var keyVisual in visuals.Values)
+        {
+            keyVisual.SetGameSettings(settings);
+        }
     }
 
     private void ExtractKeyVisuals()
@@ -94,6 +105,15 @@ public class KeyboardVisual : MonoBehaviour
         if (keyVisual != null)
         {
             keyVisual.SetPressed(isPressed);
+        }
+    }
+
+    public void ResetAllKeys()
+    {
+        foreach(var key in visuals.Values)
+        {
+            key.SetActiveKey(false);
+            key.SetErrorKey(false);
         }
     }
 }

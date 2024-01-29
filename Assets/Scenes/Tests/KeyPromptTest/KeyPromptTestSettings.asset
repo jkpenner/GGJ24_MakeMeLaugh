@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sequenceSource: {fileID: 4900000, guid: d796fa364bde1734281e5f229739abc8, type: 3}
   maxKeysHeldAtOnce: 5
-  maxActivePrompts: 1
+  showIncomingHighlights: 1

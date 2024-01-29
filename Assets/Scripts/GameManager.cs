@@ -1,8 +1,5 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
@@ -22,8 +19,7 @@ public class GameManager : MonoBehaviour
 {
     [SerializeField] GameSettings settings;
     [SerializeField] KeySequenceManager sequence;
-    [SerializeField] KeyPromptContainer prompts;
-    [SerializeField] KeyboardVisual visual;
+    [SerializeField] UserInterface ui;
 
     Keyboard current;
     Key[] keys;
@@ -32,6 +28,11 @@ public class GameManager : MonoBehaviour
 
     private GameState state = GameState.Initializing;
     private bool isGameOver = false;
+
+    private int currentLifes;
+    private float startTime;
+    private int streak;
+    private int score;
 
     public IEnumerator Start()
     {
@@ -52,7 +53,9 @@ public class GameManager : MonoBehaviour
         sequence.GroupFailed += OnGroupFailed;
         sequence.KeyEventTriggered += OnKeyEvent;
 
-        prompts.PromptsCleared += OnPromptsCleared;
+        ui.Prompts.PromptsCleared += OnPromptsCleared;
+
+
 
         if (settings is null)
         {
@@ -61,21 +64,33 @@ public class GameManager : MonoBehaviour
 
         yield return null;
 
-        sequence.SetGameSettings(settings);
-        sequence.StartNextGroup();
-        SetGameState(GameState.GroupActive);
+        StartGameWithSettings(settings);
     }
 
     public void StartGameWithSettings(GameSettings settings)
     {
         this.settings = settings;
+
+        currentLifes = settings.lifeCount;
+        ui.SetLifes(currentLifes);
+        ui.SetMultiplier(1);
+        ui.SetScore(score);
+        ui.SetTimer(0f);
+
+
+        ui.SetGameSettings(settings);
+
         sequence.SetGameSettings(settings);
         sequence.StartNextGroup();
         SetGameState(GameState.GroupActive);
+
+        startTime = Time.time;
     }
 
     private void Update()
     {
+        ui.SetTimer(Time.time - startTime);
+
         if (state == GameState.GroupComplete && heldKeys.Count == 0)
         {
             sequence.StartNextGroup();
@@ -91,15 +106,16 @@ public class GameManager : MonoBehaviour
         }
 
         // Temp reload sceen after all keys are releasse when in a game over state
-        if ((state == GameState.GameOver || state == GameState.GameVictory) && heldKeys.Count == 0)
+        if (state == GameState.GameOver || state == GameState.GameVictory)
         {
-            SceneManager.LoadScene(0);
+            if (current.spaceKey.wasPressedThisFrame)
+            {
+                SceneManager.LoadScene(0);
+            }            
         }
 
         ProcessKeyEvents();
     }
-
-
 
     private void ProcessKeyEvents()
     {
@@ -150,33 +166,66 @@ public class GameManager : MonoBehaviour
     {
         // Wait for all prompts to stop moving before despawning them. This will
         // allow the player to see what keys were missed for a breif period.
-        yield return new WaitUntil(() => !prompts.HasAnyMovingPrompts());
+        yield return new WaitUntil(() => !ui.Prompts.HasAnyMovingPrompts());
         yield return new WaitForSeconds(0.5f);
 
-        if (prompts.AnyActivePrompts())
+        if (ui.Prompts.AnyActivePrompts())
         {
-            prompts.DespawnAll();
+            ui.Prompts.DespawnAll();
         }
         else
         {
             OnPromptsCleared();
         }
+
+        ui.Keyboard.ResetAllKeys();
     }
 
     private void OnKeyEvent(KeyEventArgs args)
     {
+        if (state == GameState.GroupActive)
+        {
+            if (args.EventType == KeyEventType.WrongKeyPressed)
+            {
+                ui.Notification.ShowMessage(
+                    "Streak Broken",
+                    "Hit the wrong key",
+                    GameConsts.Red
+                );
+            }
+            else if (args.EventType == KeyEventType.KeyReleased)
+            {
+                ui.Notification.ShowMessage(
+                    "Streak Broken",
+                    "Release a key too early",
+                    GameConsts.Red
+                );
+            }
+        }
+
+
         if (args.EventType == KeyEventType.Success)
         {
-            if (prompts.PromptIndexMap.TryGetValue(args.KeyIndex, out var prompt))
+            AddKeyPressScore();
+
+            if (ui.Prompts.PromptIndexMap.TryGetValue(args.KeyIndex, out var prompt))
             {
                 prompt.SetAsSuccess();
             }
         }
         else
         {
-            if (prompts.PromptIndexMap.TryGetValue(args.KeyIndex, out var prompt))
+            ClearStreak();
+
+            if (ui.Prompts.PromptIndexMap.TryGetValue(args.KeyIndex, out var prompt))
             {
                 prompt.SetAsFailed();
+
+                var key = args.Group.Keys[args.KeyIndex];
+                if (ui.Keyboard.TryGetKeyVisual(key, out var keyVisual))
+                {
+                    keyVisual.SetErrorKey(true);
+                }
             }
         }
     }
@@ -185,12 +234,26 @@ public class GameManager : MonoBehaviour
     {
         if (!args.Group.IsCompleted)
         {
-            prompts.SpawnKeyPrompt(args.Group, args.KeyIndex);
+            ui.Prompts.SpawnKeyPrompt(args.Group, args.KeyIndex);
+
+            var key = args.Group.Keys[args.KeyIndex];
+            if (ui.Keyboard.TryGetKeyVisual(key, out var keyVisual))
+            {
+                keyVisual.SetActiveKey(true);
+            }
         }
     }
 
     private void OnGroupCompleted(KeySequenceGroupEventArgs args)
     {
+        ui.Notification.ShowMessage(
+           "Sequence Complete",
+           "Release keys to start next sequence",
+           GameConsts.Green
+       );
+
+        AddGroupCompleteScore();
+
         // Group was successfully completed
         Debug.Log("Successfully completed a group");
         SetGameState(GameState.GroupDespawning);
@@ -199,7 +262,18 @@ public class GameManager : MonoBehaviour
     private void OnGroupFailed(KeySequenceGroupEventArgs args)
     {
         Debug.Log("Failed to completed a group");
-        isGameOver = true;
+
+        if (!isGameOver)
+        {
+            currentLifes -= 1;
+            ui.SetLifes(currentLifes);
+
+            if (currentLifes <= 0)
+            {
+                isGameOver = true;
+            }
+        }
+
         SetGameState(GameState.GroupDespawning);
     }
 
@@ -217,25 +291,51 @@ public class GameManager : MonoBehaviour
 
     private void OnGameVictoryEntered()
     {
-        Debug.Log("Game Won!");
+        ui.Score.Show("Completed Sequence", score, currentLifes, Time.time - startTime, GameConsts.Green);
     }
 
     private void OnGameOverEntered()
     {
-        Debug.Log("Game Over");
+        ui.Score.Show("Failed Sequence", score, currentLifes, Time.time - startTime, GameConsts.Red);
     }
 
     private void OnKeyPressEvent(Key key)
     {
-        visual.SetKeyPressed(key, true);
+        ui.Keyboard.SetKeyPressed(key, true);
         sequence.HandlePressEvent(key);
         heldKeys.Add(key);
     }
 
     private void OnKeyReleaseEvent(Key key)
     {
-        visual.SetKeyPressed(key, false);
+        ui.Keyboard.SetKeyPressed(key, false);
         sequence.HandleReleaseEvent(key);
         heldKeys.Remove(key);
+    }
+
+    private float GetMultiplier()
+    {
+        return Mathf.Min(1f + ((float)streak / settings.requireStreakPerRank), settings.maxMultiplier);
+    }
+
+    private void AddKeyPressScore()
+    {
+        streak += 1;
+        score += Mathf.RoundToInt(settings.baseButtonPressScore * GetMultiplier());
+
+        ui.SetScore(score);
+        ui.SetMultiplier(Mathf.RoundToInt(GetMultiplier()));
+    }
+
+    private void AddGroupCompleteScore()
+    {
+        score += Mathf.RoundToInt(settings.baseSequenceCompleteScore * GetMultiplier());
+        ui.SetScore(score);
+    }
+
+    private void ClearStreak()
+    {
+        streak = 0;
+        ui.SetMultiplier(Mathf.RoundToInt(GetMultiplier()));
     }
 }

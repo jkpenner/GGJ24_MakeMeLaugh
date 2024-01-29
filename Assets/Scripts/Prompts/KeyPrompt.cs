@@ -7,6 +7,7 @@ using Unity.VisualScripting;
 
 public enum KeyPromptState
 {
+    Spawned,
     Normal,
     Success,
     Failed,
@@ -86,7 +87,7 @@ public class KeyPrompt : MonoBehaviour
 
         State = KeyPromptState.Failed;
 
-        backgroundImage.color = new Color(0.929f, 0.306f, 0.263f, 1f);
+        backgroundImage.color = GameConsts.Red;
         rectTransform.sizeDelta = new Vector2(rectTransform.sizeDelta.x, 60f);
         holdVisuals.gameObject.SetActive(false);
     }
@@ -100,7 +101,7 @@ public class KeyPrompt : MonoBehaviour
 
         State = KeyPromptState.Success;
 
-        backgroundImage.color = new Color(0.2f, 0.804f, 0.357f, 1f);
+        backgroundImage.color = GameConsts.Green;
         rectTransform.sizeDelta = new Vector2(rectTransform.sizeDelta.x, 60f);
         holdVisuals.gameObject.SetActive(false);
     }
@@ -114,7 +115,7 @@ public class KeyPrompt : MonoBehaviour
 
         State = KeyPromptState.Normal;
 
-        backgroundImage.color = new Color(0f, 0.56f, 0.67f, 1f);
+        backgroundImage.color = GameConsts.Blue;
         rectTransform.sizeDelta = new Vector2(rectTransform.sizeDelta.x, 80f);
         holdVisuals.gameObject.SetActive(true);
     }

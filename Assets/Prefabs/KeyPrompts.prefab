@@ -149,7 +149,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 0.392}
+  m_Color: {r: 0.16470589, g: 0.16470589, b: 0.20392157, a: 0.8}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -178,5 +178,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ec84d88a4af1714fa0fc81aaa5a9c98, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  keyboard: {fileID: 0}
   keyPromptParent: {fileID: 6483225379797121595}
   keyPromptPrefab: {fileID: -2844626715568741513, guid: 6ac7c9112bd88984bb457ef8dd1111c0, type: 3}
+  keyPromptDropSpeed: 400
+  despawnSpeed: 400
+  despawnPosition: -160

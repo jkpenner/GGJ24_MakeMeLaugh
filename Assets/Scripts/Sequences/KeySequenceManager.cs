@@ -10,6 +10,7 @@ public class KeySequenceManager : MonoBehaviour
     private KeySequenceGenerator generator = null;
     private KeySequence sequence = null;
     private GameSettings settings;
+    private SFXPlayer sfxPlayer;
 
     public bool IsComplete => sequence?.IsComplete ?? true;
 
@@ -20,6 +21,10 @@ public class KeySequenceManager : MonoBehaviour
     public event Action<KeySequenceGroupEventArgs> GroupFailed;
 
     public event Action<KeyEventArgs> KeyEventTriggered;
+
+    private void Awake() {
+        sfxPlayer = FindAnyObjectByType<SFXPlayer>();
+    }
 
     public void SetGameSettings(GameSettings settings)
     {
@@ -60,6 +65,8 @@ public class KeySequenceManager : MonoBehaviour
 
         if (sequence.IsActiveKey(key))
         {
+            // play sound
+            sfxPlayer.PlayRandomGoodSFX();
             KeyEventTriggered?.Invoke(new KeyEventArgs(
                 key,
                 sequence.State.keyIndex,
@@ -77,6 +84,7 @@ public class KeySequenceManager : MonoBehaviour
 
             if (sequence.IsCurrentGroupComplete())
             {
+                sfxPlayer.PlayRandomGroupCompletedSFX();
                 GroupCompleted?.Invoke(new KeySequenceGroupEventArgs(
                     sequence.GetCurrentGroup(),
                     sequence.State.keyIndex
@@ -92,6 +100,7 @@ public class KeySequenceManager : MonoBehaviour
         }
         else
         {
+            sfxPlayer.PlayRandomFailedSFX();
             KeyEventTriggered?.Invoke(new KeyEventArgs(
                 key,
                 sequence.State.keyIndex,
