@@ -105,6 +105,7 @@ public class GameManager : MonoBehaviour
                 if (settings.mode == GameMode.Random && settings.infinite)
                 {
                     sequence.Regenerate();
+                    sequence.StartNextGroup();
                     SetGameState(GameState.GroupActive);
                 }
                 else
