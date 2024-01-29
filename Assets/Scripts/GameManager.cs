@@ -90,6 +90,11 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
+        if (current != null && current.escapeKey.wasPressedThisFrame)
+        {
+            SceneManager.LoadScene(GameConsts.MainMenuBuildIndex);
+        }
+
         if (state == GameState.GroupActive)
         {
             time += Time.deltaTime;

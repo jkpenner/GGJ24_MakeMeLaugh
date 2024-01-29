@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -34,6 +35,14 @@ public class MenuManager : MonoBehaviour {
             SFXPlayer.Instance.PlayRandomGoodSFX();
             LoadGamePlayWithSettings(endlessSettings);
         });
+    }
+
+    private void Update()
+    {
+        if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
+        {
+            Application.Quit();
+        }
     }
 
     private void LoadGamePlayWithSettings(GameSettings settings)

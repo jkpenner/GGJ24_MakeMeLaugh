@@ -93,6 +93,11 @@ public class StartupManager : MonoBehaviour
 
         if (screenTwo.gameObject.activeSelf)
         {
+            if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
+            {
+                Application.Quit();
+            }
+
             if (current.spaceKey.wasPressedThisFrame)
             {
                 PlayerPrefs.SetInt(GameConsts.MaxSequenceLengthKey, Mathf.Min(maxPressedKeys, GameConsts.MaxKeySeqence));
