@@ -13,6 +13,8 @@ public class KeyVisual : MonoBehaviour
     private Image image;
 
     public bool IsPressed { get; private set; }
+    public bool IsActiveKey { get; private set; }
+    public bool IsErrorKey { get; private set; }
 
     private void Awake() {
         image = GetComponent<Image>();
@@ -55,12 +57,43 @@ public class KeyVisual : MonoBehaviour
     public void SetPressed(bool isPressed)
     {
         IsPressed = isPressed;
+        UpdateActiveColor();
+    }
+
+    public void SetErrorKey(bool isErrorKey)
+    {
+        IsErrorKey = isErrorKey;
+        UpdateActiveColor();
+    }
+
+    public void SetActiveKey(bool isActiveKey)
+    {
+        IsActiveKey = isActiveKey;
+        UpdateActiveColor();
+    }
+
+    private void UpdateActiveColor()
+    {
+        Color color;
+        if (IsErrorKey)
+        {
+            color = GameConsts.Red;
+        }
+        if (IsActiveKey && IsPressed)
+        {
+            color = GameConsts.Green;
+        }
+        else
+        {
+            color = GameConsts.Blue;
+        }
+        activeGroup.GetComponent<Image>().color = color;
     }
 
     private void Update()
     {
         var delta = Time.deltaTime / transitionTime;
-        t += IsPressed ? delta : -delta;
+        t += (IsPressed || IsErrorKey || IsActiveKey) ? delta : -delta;
         t = Mathf.Clamp01(t);
 
         activeGroup.gameObject.SetActive(t > 0f);

@@ -96,4 +96,13 @@ public class KeyboardVisual : MonoBehaviour
             keyVisual.SetPressed(isPressed);
         }
     }
+
+    public void ResetAllKeys()
+    {
+        foreach(var key in visuals.Values)
+        {
+            key.SetActiveKey(false);
+            key.SetErrorKey(false);
+        }
+    }
 }

@@ -161,6 +161,8 @@ public class GameManager : MonoBehaviour
         {
             OnPromptsCleared();
         }
+
+        visual.ResetAllKeys();
     }
 
     private void OnKeyEvent(KeyEventArgs args)
@@ -177,6 +179,12 @@ public class GameManager : MonoBehaviour
             if (prompts.PromptIndexMap.TryGetValue(args.KeyIndex, out var prompt))
             {
                 prompt.SetAsFailed();
+
+                var key = args.Group.Keys[args.KeyIndex];
+                if (visual.TryGetKeyVisual(key, out var keyVisual))
+                {
+                    keyVisual.SetErrorKey(true);
+                }
             }
         }
     }
@@ -186,6 +194,12 @@ public class GameManager : MonoBehaviour
         if (!args.Group.IsCompleted)
         {
             prompts.SpawnKeyPrompt(args.Group, args.KeyIndex);
+
+            var key = args.Group.Keys[args.KeyIndex];
+            if (visual.TryGetKeyVisual(key, out var keyVisual))
+            {
+                keyVisual.SetActiveKey(true);
+            }
         }
     }
 
