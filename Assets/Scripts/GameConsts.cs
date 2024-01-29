@@ -2,6 +2,12 @@ using UnityEngine;
 
 public static class GameConsts
 {
+    public const string MaxSequenceLengthKey = "MaxSequenceLength";
+
+    public const int StartupBuildIndex = 0;
+    public const int MainMenuBuildIndex = 1;
+    public const int GamePlayBuildIndex = 2;
+
     public readonly static Color Green = new Color(0.2f, 0.804f, 0.357f, 1f);
     public readonly static Color Red = new Color(0.929f, 0.306f, 0.263f, 1f);
     public readonly static Color Blue = new Color(0.267f, 0.498f, 0.886f, 1f);
