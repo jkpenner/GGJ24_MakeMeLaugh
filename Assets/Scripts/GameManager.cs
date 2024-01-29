@@ -29,6 +29,8 @@ public class GameManager : MonoBehaviour
     private GameState state = GameState.Initializing;
     private bool isGameOver = false;
 
+    private int currentLifes;
+
     public IEnumerator Start()
     {
         current = Keyboard.current;
@@ -50,7 +52,7 @@ public class GameManager : MonoBehaviour
 
         ui.Prompts.PromptsCleared += OnPromptsCleared;
 
-        
+
 
         if (settings is null)
         {
@@ -59,15 +61,16 @@ public class GameManager : MonoBehaviour
 
         yield return null;
 
-        ui.SetGameSettings(settings);
-        sequence.SetGameSettings(settings);
-        sequence.StartNextGroup();
-        SetGameState(GameState.GroupActive);
+        StartGameWithSettings(settings);
     }
 
     public void StartGameWithSettings(GameSettings settings)
     {
         this.settings = settings;
+
+        currentLifes = settings.lifeCount;
+        ui.SetLifes(currentLifes);
+
         ui.SetGameSettings(settings);
         sequence.SetGameSettings(settings);
         sequence.StartNextGroup();
@@ -213,7 +216,18 @@ public class GameManager : MonoBehaviour
     private void OnGroupFailed(KeySequenceGroupEventArgs args)
     {
         Debug.Log("Failed to completed a group");
-        isGameOver = true;
+
+        if (!isGameOver)
+        {
+            currentLifes -= 1;
+            ui.SetLifes(currentLifes);
+
+            if (currentLifes <= 0)
+            {
+                isGameOver = true;
+            }
+        }
+
         SetGameState(GameState.GroupDespawning);
     }
 

@@ -6,5 +6,6 @@ public class GameSettings : ScriptableObject
     public TextAsset sequenceSource;
     public int maxKeysHeldAtOnce = 5;
 
+    public int lifeCount = 3;
     public bool showIncomingHighlights = true;
 }

@@ -1638,7 +1638,7 @@ MonoBehaviour:
   scoreLabel: {fileID: 8408087453242101798}
   multiplierLabel: {fileID: 6646261105040575748}
   timerLabel: {fileID: 4311077057292250187}
-  livesLabel: {fileID: 5412616682159677491}
+  lifesLabel: {fileID: 5412616682159677491}
 --- !u!1 &3474690675813521227
 GameObject:
   m_ObjectHideFlags: 0
