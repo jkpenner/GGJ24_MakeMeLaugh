@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,27 +14,17 @@ public class MenuManager : MonoBehaviour {
     [SerializeField] private GameSettings mediumSettings;
     [SerializeField] private GameSettings hardSettings;
     
-    public enum Difficulty {
-        Easy = 0,
-        Medium = 1,
-        Hard = 2
-        
-    }
-    
     private void Start() {
         easyButton.onClick.AddListener(() => {
-            // PlayerPrefs.SetInt("Difficulty", (int)Difficulty.Easy);
-            // SceneManager.LoadScene(1);
+            SFXPlayer.Instance.PlayRandomGoodSFX();
             LoadGamePlayWithSettings(easySettings);
         });
         mediumButton.onClick.AddListener(() => {
-            // PlayerPrefs.SetInt("Difficulty", (int)Difficulty.Medium);
-            // SceneManager.LoadScene(1);
+            SFXPlayer.Instance.PlayRandomGoodSFX();
             LoadGamePlayWithSettings(mediumSettings);
         });
         hardButton.onClick.AddListener(() => {
-            // PlayerPrefs.SetInt("Difficulty", (int)Difficulty.Hard);
-            // SceneManager.LoadScene(1);
+            SFXPlayer.Instance.PlayRandomGoodSFX();
             LoadGamePlayWithSettings(hardSettings);
         });
     }
