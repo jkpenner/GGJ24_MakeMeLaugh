@@ -25,8 +25,8 @@ public class KeyVisual : MonoBehaviour
             Key.Backslash => "\\",
             Key.Backquote => "`",
             Key.CapsLock => "Caps Lock",
-            Key.RightShift => "Shift",
-            Key.LeftShift => "Shift",
+            Key.RightShift => "R Shift",
+            Key.LeftShift => "L Shift",
             Key.Minus => "-",
             Key.Equals => "=",
             Key.Slash => "/",
@@ -46,6 +46,8 @@ public class KeyVisual : MonoBehaviour
             Key.Quote => "'",
             Key.Period => ".",
             Key.Comma => ",",
+            Key.LeftCtrl => "L Ctrl",
+            Key.RightCtrl => "R Ctrl",
             _ => key.ToString()
         };
     }
