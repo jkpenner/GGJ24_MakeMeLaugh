@@ -100,6 +100,7 @@ public class KeySequenceManager : MonoBehaviour
         }
         else
         {
+            sfxPlayer.PlayRandomFailedSFX();
             KeyEventTriggered?.Invoke(new KeyEventArgs(
                 key,
                 sequence.State.keyIndex,

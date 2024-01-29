@@ -24,7 +24,7 @@ public class SFXPlayer : MonoBehaviour {
         audioSource.PlayOneShot(rowCompletedSounds[Random.Range(0,rowCompletedSounds.Length -1)]);
     }
     
-    public void PlayRandomBadSFX() {
+    public void PlayRandomFailedSFX() {
         audioSource.PlayOneShot(badSFXSounds[Random.Range(0,badSFXSounds.Length -1)]);
     }
 }
