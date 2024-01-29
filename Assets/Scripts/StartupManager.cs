@@ -59,7 +59,7 @@ public class StartupManager : MonoBehaviour
                     keyHit = false;
                     keyCounter = 0f;
 
-                    var limited = Mathf.Min(maxPressedKeys, 10);
+                    var limited = Mathf.Min(maxPressedKeys, GameConsts.MaxKeySeqence);
 
                     resultText.text = $"Your Keyboard allows for up to {maxPressedKeys} key pressed simultaneously.\nSequence lengths will be limited to {limited} charaters.";
                 }
@@ -95,7 +95,7 @@ public class StartupManager : MonoBehaviour
         {
             if (current.spaceKey.wasPressedThisFrame)
             {
-                PlayerPrefs.SetInt(GameConsts.MaxSequenceLengthKey, maxPressedKeys);
+                PlayerPrefs.SetInt(GameConsts.MaxSequenceLengthKey, Mathf.Min(maxPressedKeys, GameConsts.MaxKeySeqence));
                 SceneManager.LoadScene(GameConsts.MainMenuBuildIndex);
 
                 Debug.Log("Load Main Menu");

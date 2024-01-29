@@ -2,6 +2,9 @@ using UnityEngine;
 
 public static class GameConsts
 {
+    public const int MinKeySeqence = 4;
+    public const int MaxKeySeqence = 10;
+    public const int DefaultMaxKeySequence = 5;
     public const string MaxSequenceLengthKey = "MaxSequenceLength";
 
     public const int StartupBuildIndex = 0;

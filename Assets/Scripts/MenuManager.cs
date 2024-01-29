@@ -52,6 +52,8 @@ public class MenuManager : MonoBehaviour {
             yield break;
         }
 
+        settings.maxKeysHeldAtOnce = PlayerPrefs.GetInt(GameConsts.MaxSequenceLengthKey, GameConsts.DefaultMaxKeySequence);
+
         gameManager.StartGameWithSettings(settings);
 
         var activeSceneIndex = SceneManager.GetActiveScene().buildIndex;

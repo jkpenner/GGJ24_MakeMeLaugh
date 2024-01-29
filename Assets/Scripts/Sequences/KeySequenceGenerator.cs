@@ -36,7 +36,7 @@ public class KeySequenceGenerator
         for (int j = 0; j < settings.generateGroupCount; j++)
         {
             var amount = UnityEngine.Random.Range(
-                Mathf.Min(3, settings.maxKeysHeldAtOnce - 1),
+                Mathf.Min(GameConsts.MinKeySeqence, settings.maxKeysHeldAtOnce - 1),
                 settings.maxKeysHeldAtOnce
             );
 
