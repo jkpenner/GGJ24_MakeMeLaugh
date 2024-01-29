@@ -9,7 +9,7 @@ public class SFXPlayer : MonoBehaviour {
     [SerializeField] private AudioClip[] badSFXSounds;
     [SerializeField] private AudioClip[] rowCompletedSounds;
 
-    static AudioSource audioSource;
+    AudioSource audioSource;
     private static SFXPlayer _instance;
     public static SFXPlayer Instance => _instance;
 

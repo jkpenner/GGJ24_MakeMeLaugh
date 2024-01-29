@@ -85,7 +85,7 @@ public class KeySequenceManager : MonoBehaviour
         if (sequence.IsActiveKey(key))
         {
             // play sound
-            sfxPlayer.PlayRandomGoodSFX();
+            SFXPlayer.Instance.PlayRandomGoodSFX();
             KeyEventTriggered?.Invoke(new KeyEventArgs(
                 key,
                 sequence.State.keyIndex,
@@ -103,7 +103,7 @@ public class KeySequenceManager : MonoBehaviour
 
             if (sequence.IsCurrentGroupComplete())
             {
-                sfxPlayer.PlayRandomGroupCompletedSFX();
+                SFXPlayer.Instance.PlayRandomGroupCompletedSFX();
                 GroupCompleted?.Invoke(new KeySequenceGroupEventArgs(
                     sequence.GetCurrentGroup(),
                     sequence.State.keyIndex
@@ -119,7 +119,7 @@ public class KeySequenceManager : MonoBehaviour
         }
         else
         {
-            sfxPlayer.PlayRandomFailedSFX();
+            SFXPlayer.Instance.PlayRandomFailedSFX();
             KeyEventTriggered?.Invoke(new KeyEventArgs(
                 key,
                 sequence.State.keyIndex,
