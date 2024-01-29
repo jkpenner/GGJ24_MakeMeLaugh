@@ -1,8 +1,5 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
@@ -22,8 +19,7 @@ public class GameManager : MonoBehaviour
 {
     [SerializeField] GameSettings settings;
     [SerializeField] KeySequenceManager sequence;
-    [SerializeField] KeyPromptContainer prompts;
-    [SerializeField] KeyboardVisual visual;
+    [SerializeField] UserInterface ui;
 
     Keyboard current;
     Key[] keys;
@@ -52,7 +48,7 @@ public class GameManager : MonoBehaviour
         sequence.GroupFailed += OnGroupFailed;
         sequence.KeyEventTriggered += OnKeyEvent;
 
-        prompts.PromptsCleared += OnPromptsCleared;
+        ui.Prompts.PromptsCleared += OnPromptsCleared;
 
         
 
@@ -63,7 +59,7 @@ public class GameManager : MonoBehaviour
 
         yield return null;
 
-        visual.SetGameSettings(settings);
+        ui.SetGameSettings(settings);
         sequence.SetGameSettings(settings);
         sequence.StartNextGroup();
         SetGameState(GameState.GroupActive);
@@ -72,7 +68,7 @@ public class GameManager : MonoBehaviour
     public void StartGameWithSettings(GameSettings settings)
     {
         this.settings = settings;
-        visual.SetGameSettings(settings);
+        ui.SetGameSettings(settings);
         sequence.SetGameSettings(settings);
         sequence.StartNextGroup();
         SetGameState(GameState.GroupActive);
@@ -154,38 +150,38 @@ public class GameManager : MonoBehaviour
     {
         // Wait for all prompts to stop moving before despawning them. This will
         // allow the player to see what keys were missed for a breif period.
-        yield return new WaitUntil(() => !prompts.HasAnyMovingPrompts());
+        yield return new WaitUntil(() => !ui.Prompts.HasAnyMovingPrompts());
         yield return new WaitForSeconds(0.5f);
 
-        if (prompts.AnyActivePrompts())
+        if (ui.Prompts.AnyActivePrompts())
         {
-            prompts.DespawnAll();
+            ui.Prompts.DespawnAll();
         }
         else
         {
             OnPromptsCleared();
         }
 
-        visual.ResetAllKeys();
+        ui.Keyboard.ResetAllKeys();
     }
 
     private void OnKeyEvent(KeyEventArgs args)
     {
         if (args.EventType == KeyEventType.Success)
         {
-            if (prompts.PromptIndexMap.TryGetValue(args.KeyIndex, out var prompt))
+            if (ui.Prompts.PromptIndexMap.TryGetValue(args.KeyIndex, out var prompt))
             {
                 prompt.SetAsSuccess();
             }
         }
         else
         {
-            if (prompts.PromptIndexMap.TryGetValue(args.KeyIndex, out var prompt))
+            if (ui.Prompts.PromptIndexMap.TryGetValue(args.KeyIndex, out var prompt))
             {
                 prompt.SetAsFailed();
 
                 var key = args.Group.Keys[args.KeyIndex];
-                if (visual.TryGetKeyVisual(key, out var keyVisual))
+                if (ui.Keyboard.TryGetKeyVisual(key, out var keyVisual))
                 {
                     keyVisual.SetErrorKey(true);
                 }
@@ -197,10 +193,10 @@ public class GameManager : MonoBehaviour
     {
         if (!args.Group.IsCompleted)
         {
-            prompts.SpawnKeyPrompt(args.Group, args.KeyIndex);
+            ui.Prompts.SpawnKeyPrompt(args.Group, args.KeyIndex);
 
             var key = args.Group.Keys[args.KeyIndex];
-            if (visual.TryGetKeyVisual(key, out var keyVisual))
+            if (ui.Keyboard.TryGetKeyVisual(key, out var keyVisual))
             {
                 keyVisual.SetActiveKey(true);
             }
@@ -245,14 +241,14 @@ public class GameManager : MonoBehaviour
 
     private void OnKeyPressEvent(Key key)
     {
-        visual.SetKeyPressed(key, true);
+        ui.Keyboard.SetKeyPressed(key, true);
         sequence.HandlePressEvent(key);
         heldKeys.Add(key);
     }
 
     private void OnKeyReleaseEvent(Key key)
     {
-        visual.SetKeyPressed(key, false);
+        ui.Keyboard.SetKeyPressed(key, false);
         sequence.HandleReleaseEvent(key);
         heldKeys.Remove(key);
     }
