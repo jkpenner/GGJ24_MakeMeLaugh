@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6c836d24d671134e9d5925b93c5f6b1, type: 3}
+  m_Name: Endless
+  m_EditorClassIdentifier: 
+  lifeCount: 3
+  maxKeysHeldAtOnce: 5
+  showIncomingHighlights: 1
+  mode: 1
+  sequenceSource: {fileID: 0}
+  generateGroupCount: 5
+  infinite: 1
+  baseButtonPressScore: 10
+  baseSequenceCompleteScore: 100
+  maxMultiplier: 4
+  requireStreakPerRank: 10
+  lifeScoreBonus: 1000
+  timeScoreBonusMax: 1000
+  timeScoreBonusMin: 100
+  timeBonusFalloffStart: 30
+  timeBonusFalloffEnd: 120

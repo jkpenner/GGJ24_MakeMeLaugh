@@ -38,7 +38,7 @@ public class UserInterface : MonoBehaviour
     {
         if (multiplierLabel != null)
         {
-            multiplierLabel.text = multiplier.ToString();
+            multiplierLabel.text = $"x{multiplier}";
         }
     }
 

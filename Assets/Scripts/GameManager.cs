@@ -30,7 +30,7 @@ public class GameManager : MonoBehaviour
     private bool isGameOver = false;
 
     private int currentLifes;
-    private float startTime;
+    private float time;
     private int streak;
     private int score;
 
@@ -84,12 +84,17 @@ public class GameManager : MonoBehaviour
         sequence.StartNextGroup();
         SetGameState(GameState.GroupActive);
 
-        startTime = Time.time;
+        time = 0f;
+        ui.SetTimer(time);
     }
 
     private void Update()
     {
-        ui.SetTimer(Time.time - startTime);
+        if (state == GameState.GroupActive)
+        {
+            time += Time.deltaTime;
+            ui.SetTimer(time);
+        }
 
         if (state == GameState.GroupComplete && heldKeys.Count == 0)
         {
@@ -97,7 +102,15 @@ public class GameManager : MonoBehaviour
 
             if (sequence.IsComplete)
             {
-                SetGameState(GameState.GameVictory);
+                if (settings.mode == GameMode.Random && settings.infinite)
+                {
+                    sequence.Regenerate();
+                    SetGameState(GameState.GroupActive);
+                }
+                else
+                {
+                    SetGameState(GameState.GameVictory);
+                }                
             }
             else
             {
@@ -111,7 +124,7 @@ public class GameManager : MonoBehaviour
             if (current.spaceKey.wasPressedThisFrame)
             {
                 SceneManager.LoadScene(0);
-            }            
+            }
         }
 
         ProcessKeyEvents();
@@ -291,12 +304,12 @@ public class GameManager : MonoBehaviour
 
     private void OnGameVictoryEntered()
     {
-        ui.Score.Show("Completed Sequence", score, currentLifes, Time.time - startTime, GameConsts.Green);
+        ui.Score.Show("Completed Sequence", score, currentLifes, time, GameConsts.Green);
     }
 
     private void OnGameOverEntered()
     {
-        ui.Score.Show("Failed Sequence", score, currentLifes, Time.time - startTime, GameConsts.Red);
+        ui.Score.Show("Failed Sequence", score, currentLifes, time, GameConsts.Red);
     }
 
     private void OnKeyPressEvent(Key key)

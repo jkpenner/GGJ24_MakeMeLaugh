@@ -9,10 +9,19 @@ public class SFXPlayer : MonoBehaviour {
     [SerializeField] private AudioClip[] badSFXSounds;
     [SerializeField] private AudioClip[] rowCompletedSounds;
 
-    static AudioSource audioSource;
+    AudioSource audioSource;
+    private static SFXPlayer _instance;
+    public static SFXPlayer Instance => _instance;
 
     private void Awake() {
         audioSource = GetComponent<AudioSource>();
+        
+        if (_instance != null && _instance != this) {
+            Destroy(gameObject);
+        } else {
+            _instance = this;
+        }
+        DontDestroyOnLoad(gameObject);
     }
     
     public void PlayRandomGoodSFX() {
