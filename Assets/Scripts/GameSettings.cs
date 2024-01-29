@@ -1,14 +1,29 @@
 using UnityEngine;
 
+public enum GameMode
+{
+    Fixed,
+    Random,
+}
+
 [CreateAssetMenu(menuName = "Game Settings")]
 public class GameSettings : ScriptableObject
 {
-    public TextAsset sequenceSource;
-    public int maxKeysHeldAtOnce = 5;
-
     public int lifeCount = 3;
+    public int maxKeysHeldAtOnce = 5;
     public bool showIncomingHighlights = true;
 
+
+    [Header("Game Mode")]
+    public GameMode mode;
+    
+
+    [Header("Fixed Settings")]
+    public TextAsset sequenceSource;
+
+    [Header("Random Settings")]
+    public int generateGroupCount = 5;
+    public bool infinite = false;
 
     [Header("Scoring")]
     public int baseButtonPressScore = 10;

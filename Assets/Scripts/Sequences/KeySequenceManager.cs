@@ -7,7 +7,6 @@ public class KeySequenceManager : MonoBehaviour
     [SerializeField] int maxLettersBetweenHolds = 5;
     [SerializeField] int maxKeysHeldAtOnce = 3;
 
-    private KeySequenceGenerator generator = null;
     private KeySequence sequence = null;
     private GameSettings settings;
     private SFXPlayer sfxPlayer;
@@ -22,7 +21,8 @@ public class KeySequenceManager : MonoBehaviour
 
     public event Action<KeyEventArgs> KeyEventTriggered;
 
-    private void Awake() {
+    private void Awake()
+    {
         sfxPlayer = FindAnyObjectByType<SFXPlayer>();
     }
 
@@ -35,14 +35,33 @@ public class KeySequenceManager : MonoBehaviour
         }
 
         this.settings = settings;
+        Regenerate();
+    }
 
-        if (settings.sequenceSource is not null && !string.IsNullOrEmpty(settings.sequenceSource.text))
+    public void Regenerate()
+    {
+        if (settings is null)
         {
-            sequence = KeySequenceGenerator.GenerateSequence(settings.sequenceSource.text);
+            Debug.LogError("Game Settings are null. Unable to setup KeySequence");
+            return;
+        }
+
+        if (settings.mode == GameMode.Fixed)
+        {
+            if (settings.sequenceSource is not null && !string.IsNullOrEmpty(settings.sequenceSource.text))
+            {
+                sequence = KeySequenceGenerator.GenerateSequence(settings.sequenceSource.text);
+                sequence.State.Reset();
+            }
+            else
+            {
+                Debug.LogWarning($"KeySequence word source is not setup.");
+            }
         }
         else
         {
-            Debug.LogWarning($"KeySequence word source is not setup.");
+            sequence = KeySequenceGenerator.GenerateRandomSequence(settings);
+            sequence.State.Reset();
         }
     }
 

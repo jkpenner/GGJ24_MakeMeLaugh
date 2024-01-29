@@ -102,7 +102,15 @@ public class GameManager : MonoBehaviour
 
             if (sequence.IsComplete)
             {
-                SetGameState(GameState.GameVictory);
+                if (settings.mode == GameMode.Random && settings.infinite)
+                {
+                    sequence.Regenerate();
+                    SetGameState(GameState.GroupActive);
+                }
+                else
+                {
+                    SetGameState(GameState.GameVictory);
+                }                
             }
             else
             {
