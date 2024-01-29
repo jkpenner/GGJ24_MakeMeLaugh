@@ -11,6 +11,7 @@ public class KeyVisual : MonoBehaviour
     private float t = 0f;
     private float transitionTime = 0.2f;
     private Image image;
+    private GameSettings settings;
 
     public bool IsPressed { get; private set; }
     public bool IsActiveKey { get; private set; }
@@ -19,6 +20,11 @@ public class KeyVisual : MonoBehaviour
     private void Awake() {
         image = GetComponent<Image>();
         activeGroup.alpha = 0f;
+    }
+
+    public void SetGameSettings(GameSettings settings)
+    {
+        this.settings = settings;
     }
 
     public void SetKey(Key key)
@@ -79,7 +85,7 @@ public class KeyVisual : MonoBehaviour
         {
             color = GameConsts.Red;
         }
-        if (IsActiveKey && IsPressed)
+        else if (IsActiveKey && IsPressed)
         {
             color = GameConsts.Green;
         }
@@ -87,13 +93,19 @@ public class KeyVisual : MonoBehaviour
         {
             color = GameConsts.Blue;
         }
+
         activeGroup.GetComponent<Image>().color = color;
+    }
+
+    private bool ShowHighlighting()
+    {
+        return IsPressed || IsErrorKey || (IsActiveKey && (settings?.showIncomingHighlights ?? true));
     }
 
     private void Update()
     {
         var delta = Time.deltaTime / transitionTime;
-        t += (IsPressed || IsErrorKey || IsActiveKey) ? delta : -delta;
+        t += ShowHighlighting() ? delta : -delta;
         t = Mathf.Clamp01(t);
 
         activeGroup.gameObject.SetActive(t > 0f);

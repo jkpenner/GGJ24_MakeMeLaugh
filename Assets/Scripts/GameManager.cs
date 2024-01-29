@@ -54,6 +54,8 @@ public class GameManager : MonoBehaviour
 
         prompts.PromptsCleared += OnPromptsCleared;
 
+        
+
         if (settings is null)
         {
             yield break;
@@ -61,6 +63,7 @@ public class GameManager : MonoBehaviour
 
         yield return null;
 
+        visual.SetGameSettings(settings);
         sequence.SetGameSettings(settings);
         sequence.StartNextGroup();
         SetGameState(GameState.GroupActive);
@@ -69,6 +72,7 @@ public class GameManager : MonoBehaviour
     public void StartGameWithSettings(GameSettings settings)
     {
         this.settings = settings;
+        visual.SetGameSettings(settings);
         sequence.SetGameSettings(settings);
         sequence.StartNextGroup();
         SetGameState(GameState.GroupActive);
