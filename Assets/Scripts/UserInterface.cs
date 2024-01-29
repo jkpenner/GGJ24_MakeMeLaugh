@@ -11,10 +11,12 @@ public class UserInterface : MonoBehaviour
     [SerializeField] TMP_Text timerLabel;
     [SerializeField] TMP_Text lifesLabel;
     [SerializeField] GameNotification notification;
+    [SerializeField] ScorePopup score;
 
     public KeyboardVisual Keyboard => keyboard;
     public KeyPromptContainer Prompts => prompts;
     public GameNotification Notification => notification;
+    public ScorePopup Score => score;
 
     public void SetScore(int score)
     {
@@ -61,5 +63,6 @@ public class UserInterface : MonoBehaviour
     public void SetGameSettings(GameSettings settings)
     {
         keyboard.SetGameSettings(settings);
+        score.SetGameSettings(settings);
     }
 }

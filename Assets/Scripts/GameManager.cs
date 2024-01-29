@@ -106,15 +106,16 @@ public class GameManager : MonoBehaviour
         }
 
         // Temp reload sceen after all keys are releasse when in a game over state
-        if ((state == GameState.GameOver || state == GameState.GameVictory) && heldKeys.Count == 0)
+        if (state == GameState.GameOver || state == GameState.GameVictory)
         {
-            SceneManager.LoadScene(0);
+            if (current.spaceKey.wasPressedThisFrame)
+            {
+                SceneManager.LoadScene(0);
+            }            
         }
 
         ProcessKeyEvents();
     }
-
-
 
     private void ProcessKeyEvents()
     {
@@ -290,12 +291,12 @@ public class GameManager : MonoBehaviour
 
     private void OnGameVictoryEntered()
     {
-        Debug.Log("Game Won!");
+        ui.Score.Show("Completed Sequence", score, currentLifes, Time.time - startTime, GameConsts.Green);
     }
 
     private void OnGameOverEntered()
     {
-        Debug.Log("Game Over");
+        ui.Score.Show("Failed Sequence", score, currentLifes, Time.time - startTime, GameConsts.Red);
     }
 
     private void OnKeyPressEvent(Key key)
