@@ -40,9 +40,19 @@ public class UserInterface : MonoBehaviour
 
     public void SetTimer(float duration)
     {
+        int seconds = Mathf.RoundToInt(duration) % 60;
+        int minutes = Mathf.RoundToInt(duration) / 60;
+
         if (timerLabel != null)
         {
-            timerLabel.text = duration.ToString();
+            if (minutes > 0)
+            {
+                timerLabel.text = $"{minutes}m {seconds}s";    
+            }
+            else
+            {
+                timerLabel.text = $"{seconds}s";
+            }
         }
     }
 

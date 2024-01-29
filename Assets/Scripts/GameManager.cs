@@ -30,6 +30,9 @@ public class GameManager : MonoBehaviour
     private bool isGameOver = false;
 
     private int currentLifes;
+    private float startTime;
+    private int streak;
+    private int score;
 
     public IEnumerator Start()
     {
@@ -70,15 +73,24 @@ public class GameManager : MonoBehaviour
 
         currentLifes = settings.lifeCount;
         ui.SetLifes(currentLifes);
+        ui.SetMultiplier(1);
+        ui.SetScore(score);
+        ui.SetTimer(0f);
+
 
         ui.SetGameSettings(settings);
+
         sequence.SetGameSettings(settings);
         sequence.StartNextGroup();
         SetGameState(GameState.GroupActive);
+
+        startTime = Time.time;
     }
 
     private void Update()
     {
+        ui.SetTimer(Time.time - startTime);
+
         if (state == GameState.GroupComplete && heldKeys.Count == 0)
         {
             sequence.StartNextGroup();
@@ -172,6 +184,8 @@ public class GameManager : MonoBehaviour
     {
         if (args.EventType == KeyEventType.Success)
         {
+            AddKeyPressScore();
+
             if (ui.Prompts.PromptIndexMap.TryGetValue(args.KeyIndex, out var prompt))
             {
                 prompt.SetAsSuccess();
@@ -179,6 +193,8 @@ public class GameManager : MonoBehaviour
         }
         else
         {
+            ClearStreak();
+
             if (ui.Prompts.PromptIndexMap.TryGetValue(args.KeyIndex, out var prompt))
             {
                 prompt.SetAsFailed();
@@ -208,6 +224,8 @@ public class GameManager : MonoBehaviour
 
     private void OnGroupCompleted(KeySequenceGroupEventArgs args)
     {
+        AddGroupCompleteScore();
+
         // Group was successfully completed
         Debug.Log("Successfully completed a group");
         SetGameState(GameState.GroupDespawning);
@@ -265,5 +283,31 @@ public class GameManager : MonoBehaviour
         ui.Keyboard.SetKeyPressed(key, false);
         sequence.HandleReleaseEvent(key);
         heldKeys.Remove(key);
+    }
+
+    private float GetMultiplier()
+    {
+        return Mathf.Min(1f + ((float)streak / settings.requireStreakPerRank), settings.maxMultiplier);
+    }
+
+    private void AddKeyPressScore()
+    {
+        streak += 1;
+        score += Mathf.RoundToInt(settings.baseButtonPressScore * GetMultiplier());
+
+        ui.SetScore(score);
+        ui.SetMultiplier(Mathf.RoundToInt(GetMultiplier()));
+    }
+
+    private void AddGroupCompleteScore()
+    {
+        score += Mathf.RoundToInt(settings.baseSequenceCompleteScore * GetMultiplier());
+        ui.SetScore(score);
+    }
+
+    private void ClearStreak()
+    {
+        streak = 0;
+        ui.SetMultiplier(Mathf.RoundToInt(GetMultiplier()));
     }
 }
