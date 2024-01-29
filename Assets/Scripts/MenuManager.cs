@@ -9,10 +9,12 @@ public class MenuManager : MonoBehaviour {
     [SerializeField] private Button easyButton;
     [SerializeField] private Button mediumButton;
     [SerializeField] private Button hardButton;
+    [SerializeField] private Button endlessButton;
 
     [SerializeField] private GameSettings easySettings;
     [SerializeField] private GameSettings mediumSettings;
     [SerializeField] private GameSettings hardSettings;
+    [SerializeField] private GameSettings endlessSettings;
     
     private void Start() {
         easyButton.onClick.AddListener(() => {
@@ -27,6 +29,11 @@ public class MenuManager : MonoBehaviour {
             SFXPlayer.Instance.PlayRandomGoodSFX();
             LoadGamePlayWithSettings(hardSettings);
         });
+
+        endlessButton.onClick.AddListener(() => {
+            SFXPlayer.Instance.PlayRandomGoodSFX();
+            LoadGamePlayWithSettings(endlessSettings);
+        });
     }
 
     private void LoadGamePlayWithSettings(GameSettings settings)
@@ -36,7 +43,7 @@ public class MenuManager : MonoBehaviour {
 
     private IEnumerator LoadGamePlayWithSettingsRoutine(GameSettings settings)
     {
-        yield return SceneManager.LoadSceneAsync(1, LoadSceneMode.Additive);
+        yield return SceneManager.LoadSceneAsync(GameConsts.GamePlayBuildIndex, LoadSceneMode.Additive);
         
         var gameManager = FindFirstObjectByType<GameManager>();
         if (gameManager == null)
