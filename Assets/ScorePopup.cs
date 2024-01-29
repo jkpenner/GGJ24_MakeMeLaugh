@@ -40,7 +40,15 @@ public class ScorePopup : MonoBehaviour
 
         baseScoreValue.text = score.ToString();
         lifeBonusValue.text = lifeBonus.ToString();
-        timerBonusValue.text = Mathf.RoundToInt(timeBonus).ToString();
+
+        if (lifes != 0)
+        {
+            timerBonusValue.text = Mathf.RoundToInt(timeBonus).ToString();
+        }
+        else
+        {
+            timerBonusValue.text = "0";
+        }
 
         totalScoreValue.text = Mathf.RoundToInt(score + lifeBonus + timeBonus).ToString();
     }
