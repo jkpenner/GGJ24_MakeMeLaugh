@@ -123,7 +123,7 @@ public class GameManager : MonoBehaviour
         {
             if (current.spaceKey.wasPressedThisFrame)
             {
-                SceneManager.LoadScene(0);
+                SceneManager.LoadScene(GameConsts.MainMenuBuildIndex);
             }
         }
 
