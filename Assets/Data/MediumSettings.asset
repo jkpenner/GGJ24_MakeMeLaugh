@@ -12,5 +12,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6c836d24d671134e9d5925b93c5f6b1, type: 3}
   m_Name: MediumSettings
   m_EditorClassIdentifier: 
-  sequenceSource: {fileID: 4900000, guid: 308d7342188994a40b2823b996c92eab, type: 3}
+  lifeCount: 5
   maxKeysHeldAtOnce: 5
+  showIncomingHighlights: 1
+  mode: 0
+  sequenceSource: {fileID: 4900000, guid: 308d7342188994a40b2823b996c92eab, type: 3}
+  generateGroupCount: 5
+  infinite: 0
+  baseButtonPressScore: 10
+  baseSequenceCompleteScore: 100
+  maxMultiplier: 4
+  requireStreakPerRank: 10
+  lifeScoreBonus: 1000
+  timeScoreBonusMax: 1000
+  timeScoreBonusMin: 0
+  timeBonusFalloffStart: 0
+  timeBonusFalloffEnd: 120

@@ -1,4 +1,10 @@
-H,A,R,D,W,O,R,K
-A,S,D,F
+H,A,R,D,W,O,K
+A,R,D,Digit8,F
 q,CAPSLOCK,SPACE,ENTER,W
 Z,X,C,V,B
+m,e,l,d,r,o,p
+w,h,i,p,e,r,s,n,a,r
+C,o,l,y,w,b,e,s
+B,i,l,n,g,s,a,t,e
+S,m,g,u,l,i,o,n
+C,o,n,j,u,b,i,l,a,n,t

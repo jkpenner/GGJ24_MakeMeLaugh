@@ -1,4 +1,9 @@
-M,E,D,I,U,M
+M,E,D,I,U
 A,S,D,F
 q,CAPSLOCK,SPACE,ENTER,W
-Z,X,C,V,B
+Z,X,C,V,Broken
+a,e,v,d,r
+Digit2,slash,semicolon,rightbracket,g
+b,u,m,f,z,l,e
+m,e,l,d,r,o,p
+w,h,i,p,e,r,s,n,a,r

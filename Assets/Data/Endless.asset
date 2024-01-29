@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Endless
   m_EditorClassIdentifier: 
   lifeCount: 3
-  maxKeysHeldAtOnce: 5
+  maxKeysHeldAtOnce: 6
   showIncomingHighlights: 1
   mode: 1
   sequenceSource: {fileID: 0}
@@ -25,6 +25,6 @@ MonoBehaviour:
   requireStreakPerRank: 10
   lifeScoreBonus: 1000
   timeScoreBonusMax: 1000
-  timeScoreBonusMin: 100
-  timeBonusFalloffStart: 30
+  timeScoreBonusMin: 0
+  timeBonusFalloffStart: 0
   timeBonusFalloffEnd: 120

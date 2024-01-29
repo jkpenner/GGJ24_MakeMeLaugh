@@ -1,4 +1,6 @@
 E,A,S,Y
 A,S,D,F
+D,T,U,L,B
 q,CAPSLOCK,SPACE,ENTER,W
 Z,X,C,V,B
+Digit0, Digit6,G,Z,E
