@@ -211,6 +211,8 @@ public class GameManager : MonoBehaviour
                     "Hit the wrong key",
                     GameConsts.Red
                 );
+
+                SFXPlayer.Instance.PlayRandomFailedSFX();
             }
             else if (args.EventType == KeyEventType.KeyReleased)
             {
@@ -219,6 +221,12 @@ public class GameManager : MonoBehaviour
                     "Release a key too early",
                     GameConsts.Red
                 );
+
+                SFXPlayer.Instance.PlayRandomFailedSFX();
+            }
+            else if (args.EventType == KeyEventType.Success)
+            {
+                SFXPlayer.Instance.PlayRandomGoodSFX();
             }
         }
 
@@ -272,6 +280,8 @@ public class GameManager : MonoBehaviour
        );
 
         AddGroupCompleteScore();
+
+        SFXPlayer.Instance.PlayRandomGroupCompletedSFX();
 
         // Group was successfully completed
         Debug.Log("Successfully completed a group");
