@@ -46,6 +46,7 @@ public class KeyPrompt : MonoBehaviour
         KeyIndex = keyIndex;
 
         keyPrompt.SetKey(Key);
+        SetAsNormal();
 
         // Search for the target key on the keyboard visual, then match it's size.
         if (Keyboard.TryGetKeyVisual(Key, out var keyVisual))
@@ -74,8 +75,6 @@ public class KeyPrompt : MonoBehaviour
         {
             Debug.LogWarning($"Failed to find key on keyboard for {Key}");
         }
-
-        SetAsNormal();
     }
 
     public void SetAsFailed()
@@ -88,7 +87,8 @@ public class KeyPrompt : MonoBehaviour
         State = KeyPromptState.Failed;
 
         backgroundImage.color = GameConsts.Red;
-        rectTransform.sizeDelta = new Vector2(rectTransform.sizeDelta.x, 60f);
+        var height = (60f / 1080f) * Screen.height;
+        rectTransform.sizeDelta = new Vector2(rectTransform.sizeDelta.x, height);
         holdVisuals.gameObject.SetActive(false);
     }
 
@@ -102,7 +102,8 @@ public class KeyPrompt : MonoBehaviour
         State = KeyPromptState.Success;
 
         backgroundImage.color = GameConsts.Green;
-        rectTransform.sizeDelta = new Vector2(rectTransform.sizeDelta.x, 60f);
+        var height = (60f / 1080f) * Screen.height;
+        rectTransform.sizeDelta = new Vector2(rectTransform.sizeDelta.x, height);
         holdVisuals.gameObject.SetActive(false);
     }
 
@@ -116,7 +117,8 @@ public class KeyPrompt : MonoBehaviour
         State = KeyPromptState.Normal;
 
         backgroundImage.color = GameConsts.Blue;
-        rectTransform.sizeDelta = new Vector2(rectTransform.sizeDelta.x, 80f);
+        var height = (80f / 1080f) * Screen.height;
+        rectTransform.sizeDelta = new Vector2(rectTransform.sizeDelta.x, height);
         holdVisuals.gameObject.SetActive(true);
     }
 }
