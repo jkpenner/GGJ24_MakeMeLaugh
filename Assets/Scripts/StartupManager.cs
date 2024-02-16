@@ -10,7 +10,10 @@ public class StartupManager : MonoBehaviour
 
     [Header("Screen One")]
     [SerializeField] GameObject screenOne;
+    [SerializeField] GameObject keyCountDown;
     [SerializeField] TMP_Text keyCountText;
+    [SerializeField] TMP_Text keyCountDownText;
+    [SerializeField] RectTransform keyCountDownFill;
 
     [Header("Screen Two")]
     [SerializeField] GameObject screenTwo;
@@ -49,9 +52,20 @@ public class StartupManager : MonoBehaviour
     {
         if (screenOne.gameObject.activeSelf)
         {
+            keyCountDown.SetActive(keyHit);
+
             if (keyHit)
             {
+                
+
                 keyCounter += Time.deltaTime;
+
+                var scale = keyCountDownFill.localScale;
+                scale.x = Mathf.Clamp01(keyCounter / confirmDelay);
+                keyCountDownFill.localScale = scale;
+
+                keyCountDownText.text = Mathf.CeilToInt(Mathf.Clamp(confirmDelay - keyCounter, 0f, confirmDelay)).ToString();
+
                 if (keyCounter >= confirmDelay)
                 {
                     screenOne.gameObject.SetActive(false);
