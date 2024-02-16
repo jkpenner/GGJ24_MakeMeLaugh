@@ -34,6 +34,8 @@ public class GameManager : MonoBehaviour
     private int streak;
     private int score;
 
+    private float timeoutCounter = 0f;
+
     public IEnumerator Start()
     {
         current = Keyboard.current;
@@ -90,6 +92,12 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
+        timeoutCounter += Time.deltaTime;
+        if (timeoutCounter >= GameConsts.InactiveTimeout)
+        {
+            SceneManager.LoadScene(GameConsts.MainMenuBuildIndex);
+        }
+
         if (current != null && current.escapeKey.wasPressedThisFrame)
         {
             SceneManager.LoadScene(GameConsts.MainMenuBuildIndex);
@@ -116,7 +124,7 @@ public class GameManager : MonoBehaviour
                 else
                 {
                     SetGameState(GameState.GameVictory);
-                }                
+                }
             }
             else
             {
@@ -144,11 +152,15 @@ public class GameManager : MonoBehaviour
             {
                 if (current[key].wasPressedThisFrame)
                 {
+                    timeoutCounter = 0f;
+
                     OnKeyPressEvent(key);
                 }
 
                 if (current[key].wasReleasedThisFrame)
                 {
+                    timeoutCounter = 0f;
+
                     OnKeyReleaseEvent(key);
                 }
             }

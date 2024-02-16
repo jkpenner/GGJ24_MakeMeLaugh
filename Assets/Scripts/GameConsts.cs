@@ -2,6 +2,8 @@ using UnityEngine;
 
 public static class GameConsts
 {
+    public const float InactiveTimeout = 30f;
+
     public const int MinKeySeqence = 4;
     public const int MaxKeySeqence = 8;
     public const int DefaultMaxKeySequence = 5;
