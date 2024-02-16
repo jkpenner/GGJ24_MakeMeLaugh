@@ -1,3 +1,4 @@
+using TMPro;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -8,9 +9,17 @@ using UnityEngine.UI;
 
 public class MenuManager : MonoBehaviour {
     [SerializeField] private Button easyButton;
+    [SerializeField] GameObject easyHighScore;
+    [SerializeField] TMP_Text easyHighScoreLabel;
     [SerializeField] private Button mediumButton;
+    [SerializeField] GameObject mediumHighScore;
+    [SerializeField] TMP_Text mediumHighScoreLabel;
     [SerializeField] private Button hardButton;
+    [SerializeField] GameObject hardHighScore;
+    [SerializeField] TMP_Text hardHighScoreLabel;
     [SerializeField] private Button endlessButton;
+    [SerializeField] GameObject endlessHighScore;
+    [SerializeField] TMP_Text endlessHighScoreLabel;
 
     [SerializeField] private GameSettings easySettings;
     [SerializeField] private GameSettings mediumSettings;
@@ -18,6 +27,23 @@ public class MenuManager : MonoBehaviour {
     [SerializeField] private GameSettings endlessSettings;
     
     private void Start() {
+        var easyHighScoreValue = PlayerPrefs.GetInt(easySettings.name, 0);
+        easyHighScore.SetActive(easyHighScoreValue != 0);
+        easyHighScoreLabel.text = easyHighScoreValue.ToString();
+
+        var mediumHighScoreValue = PlayerPrefs.GetInt(mediumSettings.name, 0);
+        mediumHighScore.SetActive(mediumHighScoreValue != 0);
+        mediumHighScoreLabel.text = mediumHighScoreValue.ToString();
+
+        var hardHighScoreValue = PlayerPrefs.GetInt(hardSettings.name, 0);
+        hardHighScore.SetActive(hardHighScoreValue != 0);
+        hardHighScoreLabel.text = hardHighScoreValue.ToString();
+
+        var endlessHighScoreValue = PlayerPrefs.GetInt(endlessSettings.name, 0);
+        endlessHighScore.SetActive(endlessHighScoreValue != 0);
+        endlessHighScoreLabel.text = endlessHighScoreValue.ToString();
+
+
         easyButton.onClick.AddListener(() => {
             SFXPlayer.Instance.PlayRandomGoodSFX();
             LoadGamePlayWithSettings(easySettings);
