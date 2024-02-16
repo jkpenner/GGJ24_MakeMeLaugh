@@ -12,6 +12,7 @@ public class KeyPromptContainer : MonoBehaviour
     [SerializeField] float keyPromptDropSpeed = 500f;
     [SerializeField] float despawnSpeed = 1000f;
     [SerializeField] float despawnPosition = -160f;
+    [SerializeField] float bottomOffset = 10f;
 
     private RectTransform rectTransform;
     private List<KeyPrompt> despawned = new List<KeyPrompt>();
@@ -37,6 +38,7 @@ public class KeyPromptContainer : MonoBehaviour
         instance.RectTransform.anchorMax = new Vector2(1f, 0f);
         instance.RectTransform.anchoredPosition = new Vector2(0f, rectTransform.rect.height);
         instance.RectTransform.sizeDelta = new Vector2(0f, instance.RectTransform.sizeDelta.y);
+        instance.RectTransform.localScale = Vector2.one;
 
         instance.Keyboard = keyboard;
         instance.Setup(group, keyIndex);
@@ -60,7 +62,7 @@ public class KeyPromptContainer : MonoBehaviour
 
     private void Update()
     {
-        float heightOffset = 0f;
+        float heightOffset = bottomOffset;
 
         foreach (var prompt in Prompts)
         {
@@ -101,7 +103,7 @@ public class KeyPromptContainer : MonoBehaviour
 
     public bool HasAnyMovingPrompts()
     {
-        float heightOffset = 0f;
+        float heightOffset = bottomOffset;
         foreach (var prompt in Prompts)
         {
             var promptRectTrans = prompt.RectTransform;
