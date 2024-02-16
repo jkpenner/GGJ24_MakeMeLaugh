@@ -13,6 +13,10 @@ public class ScorePopup : MonoBehaviour
     [SerializeField] TMP_Text totalScoreValue;
     [SerializeField] float fadeDuration = 0.75f;
 
+    [SerializeField] GameObject newHighScore;
+    [SerializeField] TMP_Text highScoreLabel;
+    [SerializeField] TMP_Text highScoreValue;
+
     private GameSettings settings;
     private bool isVisible = false;
     private float counter = 0f;
@@ -50,7 +54,25 @@ public class ScorePopup : MonoBehaviour
             timerBonusValue.text = "0";
         }
 
-        totalScoreValue.text = Mathf.RoundToInt(score + lifeBonus + timeBonus).ToString();
+        var highScore = PlayerPrefs.GetInt(settings.name, 0);
+        highScoreValue.text = highScore.ToString();
+        
+
+        var totalScore = Mathf.RoundToInt(score + lifeBonus + timeBonus);
+
+        if (totalScore >= highScore)
+        {
+            PlayerPrefs.SetInt(settings.name, totalScore);
+            newHighScore.SetActive(true);
+            highScoreLabel.text = "Old High Score";
+        }
+        else
+        {
+            newHighScore.SetActive(false);
+            highScoreLabel.text = "High Score";
+        }
+
+        totalScoreValue.text = totalScore.ToString();
     }
 
     private void Update()
