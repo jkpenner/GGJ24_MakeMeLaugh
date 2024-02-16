@@ -12,6 +12,9 @@ public class UserInterface : MonoBehaviour
     [SerializeField] TMP_Text lifesLabel;
     [SerializeField] GameNotification notification;
     [SerializeField] ScorePopup score;
+    [SerializeField] CanvasGroup inactivePrompt;
+    [SerializeField] RectTransform inactiveProgress;
+    [SerializeField] TMP_Text inactiveLabel;
 
     public KeyboardVisual Keyboard => keyboard;
     public KeyPromptContainer Prompts => prompts;
@@ -51,7 +54,7 @@ public class UserInterface : MonoBehaviour
         {
             if (minutes > 0)
             {
-                timerLabel.text = $"{minutes}m {seconds}s";    
+                timerLabel.text = $"{minutes}m {seconds}s";
             }
             else
             {
@@ -64,5 +67,32 @@ public class UserInterface : MonoBehaviour
     {
         keyboard.SetGameSettings(settings);
         score.SetGameSettings(settings);
+    }
+
+    public void UpdateTimeoutPrompt(float timeoutRemaining)
+    {
+        bool isPromptVisible = timeoutRemaining <= GameConsts.StartFadeInInactivePrompt;
+        inactivePrompt.gameObject.SetActive(isPromptVisible);
+
+        if (!isPromptVisible)
+        {
+            return;
+        }
+
+        if (timeoutRemaining >= GameConsts.FinishFadInInactivePrompt)
+        {
+            float t = timeoutRemaining - GameConsts.FinishFadInInactivePrompt;
+            t /= GameConsts.StartFadeInInactivePrompt - GameConsts.FinishFadInInactivePrompt;
+            inactivePrompt.alpha = 1f - Mathf.Clamp01(t);
+        }
+        else
+        {
+            inactivePrompt.alpha = 1f;
+        }
+        
+        var scale = inactiveProgress.localScale;
+        scale.x = 1f - (timeoutRemaining / GameConsts.StartFadeInInactivePrompt);
+        inactiveProgress.localScale = scale;
+        inactiveLabel.text = Mathf.CeilToInt(timeoutRemaining).ToString();
     }
 }

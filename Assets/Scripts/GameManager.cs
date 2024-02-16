@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
@@ -93,6 +94,13 @@ public class GameManager : MonoBehaviour
     private void Update()
     {
         timeoutCounter += Time.deltaTime;
+
+        ui.UpdateTimeoutPrompt(Mathf.Clamp(
+            GameConsts.InactiveTimeout - timeoutCounter, 
+            0f, 
+            GameConsts.InactiveTimeout
+        ));
+
         if (timeoutCounter >= GameConsts.InactiveTimeout)
         {
             SceneManager.LoadScene(GameConsts.MainMenuBuildIndex);

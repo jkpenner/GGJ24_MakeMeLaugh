@@ -2,7 +2,10 @@ using UnityEngine;
 
 public static class GameConsts
 {
-    public const float InactiveTimeout = 30f;
+    public const float InactiveTimeout = 20f;
+    /// Seconds before inactive time out occurs
+    public const float StartFadeInInactivePrompt = 5.4f;
+    public const float FinishFadInInactivePrompt = 5f;
 
     public const int MinKeySeqence = 4;
     public const int MaxKeySeqence = 8;
